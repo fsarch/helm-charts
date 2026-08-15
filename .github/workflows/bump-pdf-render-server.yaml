@@ -1,0 +1,48 @@
+name: Bump pdf-render-server chart version
+
+# Triggered by pdf-render-backend's "build our image" workflow via a
+# repository_dispatch call whenever a stable (non-prerelease) release tag is
+# published there. Payload: { "version": "0.0.3" }.
+on:
+  repository_dispatch:
+    types: [pdf-render-server-released]
+
+# Needed to commit and push the version bump directly to main. That push
+# then triggers release-charts.yaml (it watches charts/**) and publishes the
+# new chart version.
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Chart.yaml
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERSION}" ]]; then
+            echo "::error::client_payload.version is empty" >&2
+            exit 1
+          fi
+          sed -i "s/^version: .*/version: ${VERSION}/" charts/pdf-render-server/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: \"${VERSION}\"/" charts/pdf-render-server/Chart.yaml
+
+      - name: Commit and push
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Chart.yaml already at ${VERSION}, nothing to do"
+            exit 0
+          fi
+          git add charts/pdf-render-server/Chart.yaml
+          git commit -m "chore(pdf-render-server): bump chart to ${VERSION}"
+          git push
