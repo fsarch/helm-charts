@@ -1,0 +1,192 @@
+# -- Default values for the metric-server chart.
+# Declare variables to be passed into your templates.
+
+# -- Overrides the name used to build resource names (defaults to the chart name).
+nameOverride: ""
+# -- Overrides the full resource name (defaults to "<release name>-<chart name>").
+fullnameOverride: ""
+
+namespace:
+  # -- Whether the chart should create the target Namespace itself.
+  # Set to false if the namespace already exists / is managed elsewhere.
+  create: false
+  # -- Namespace to deploy the resources into. Defaults to the release namespace
+  # (`.Release.Namespace`, i.e. whatever `--namespace` / `-n` was set to) when empty.
+  name: ""
+
+# -- Extra labels applied to every resource created by this chart.
+commonLabels: {}
+
+# -- Extra annotations applied to every resource created by this chart.
+commonAnnotations: {}
+
+replicaCount: 1
+
+# -- Number of old ReplicaSets to retain for the Deployment.
+revisionHistoryLimit: 3
+
+image:
+  repository: docker.io/fsarch/metric-server
+  pullPolicy: Always
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# -- Secrets used to pull the image from a private registry.
+imagePullSecrets: []
+
+# -- Extra labels for the Pod template.
+podLabels: {}
+
+# -- Extra annotations for the Pod template.
+podAnnotations: {}
+
+podSecurityContext: {}
+# runAsNonRoot: true
+# runAsUser: 1000
+
+securityContext: {}
+# readOnlyRootFilesystem: true
+# allowPrivilegeEscalation: false
+
+serviceAccount:
+  # -- Whether a ServiceAccount should be created.
+  create: false
+  # -- Name of the ServiceAccount to use. If not set and `create` is true, a name is generated.
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  # -- Additional annotations for the Service.
+  annotations: {}
+
+# -- Container port the application listens on.
+containerPort: 8080
+
+# -- application env vars managed via well-known values below.
+# Set to "" to omit an env var entirely.
+env:
+  # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
+  port: "8080"
+  # -- Path inside the container the rendered config.yml is mounted at.
+  configFilePath: /etc/metric-server/config.yml
+
+# -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
+extraEnv: []
+# - name: LOG_LEVEL
+#   value: debug
+
+configMap:
+  # -- Whether to create the ConfigMap holding config.yml. Disable to bring your own.
+  create: true
+  # -- Overrides the ConfigMap name (defaults to "<fullname>-config").
+  nameOverride: ""
+
+# -- config.yml contents, rendered from structured values below.
+# Set `config.raw` to a literal YAML/string block to bypass the structured
+# values entirely and use it verbatim as config.yml.
+#
+# Unlike pdf-render-server, metric-server's config.yml also has `database`,
+# `partition` and `deletion` sections (no `fsarch-common` template covers
+# these - the database itself isn't deployed by this chart, it must already
+# exist and be reachable).
+config:
+  raw: ""
+
+  # auth.type selects which auth scheme is rendered into config.yml; the two
+  # schemas are mutually exclusive, only the fields for the active type are
+  # rendered:
+  #   - type: jwt-jwk -> renders auth.jwkUrl as jwkUrl
+  #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
+  auth:
+    type: oidc
+    # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
+    jwkUrl: ""
+    # -- OIDC discovery URL used to validate tokens when type is "oidc".
+    discoveryUrl: "https://login.example.com/.well-known/openid-configuration"
+
+  uac:
+    type: static
+    users:
+      - user_id: "86f01463-2952-4a7c-8d81-094561d110f0"
+        permissions:
+          - manage_metrics
+          - read_metrics
+          - write_measurements
+
+  # database.type selects which schema is rendered into config.yml's
+  # `database:` section; only the field(s) for the active type are rendered:
+  #   - type: sqlite               -> renders database.database (file path) only
+  #   - type: postgres|cockroachdb -> renders host/port/username/password/ssl
+  database:
+    type: postgres
+    host: ""
+    port: 5432
+    database: metric-server
+    username: ""
+    # -- Database password. Sensitive - prefer setting via --set or a
+    # non-committed values file rather than checking it in.
+    password: ""
+    ssl:
+      rejectUnauthorized: true
+
+  # -- Partitioning of the measurements table.
+  partition:
+    # -- Size of each partition in days.
+    partitionSizeDays: 30
+    # -- How long a partition stays in the warm tier before moving to cold, in days.
+    warmTierRetentionDays: 365
+
+  # -- Hard-deletion of soft-deleted records. Omit (set to `null`) to skip
+  # rendering the `deletion:` section entirely and rely on the app default.
+  deletion:
+    hardDeleteAfterDays: 1
+    purgeSchedule:
+      cron: "0 3 * * *"
+      timezone: "Europe/Berlin"
+
+livenessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+
+readinessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# -- Extra volumes appended to the Deployment's pod spec.
+extraVolumes: []
+
+# -- Extra volume mounts appended to the metric-server container.
+extraVolumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: metric-server.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
