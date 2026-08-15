@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - "charts/**"
+  # Also triggerable via the API (used by bump-pdf-render-server.yaml):
+  # pushes made with a workflow's own GITHUB_TOKEN don't fire other
+  # workflows' `push` triggers, so that workflow explicitly dispatches this
+  # one instead of relying on its own push to do so.
+  workflow_dispatch: {}
 
 # Allow the default GITHUB_TOKEN to push the gh-pages branch and create releases.
 permissions:
