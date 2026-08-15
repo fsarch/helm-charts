@@ -58,14 +58,6 @@ spec:
             - name: CONFIG_FILE_PATH
               value: {{ .Values.env.configFilePath | quote }}
             {{- end }}
-            {{- if .Values.env.openIdConnectDiscoveryUrl }}
-            - name: OPENID_CONNECT_DISCOVERY_URL
-              value: {{ .Values.env.openIdConnectDiscoveryUrl | quote }}
-            {{- end }}
-            {{- if .Values.env.openIdConnectClientId }}
-            - name: OPENID_CONNECT_CLIENT_ID
-              value: {{ .Values.env.openIdConnectClientId | quote }}
-            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

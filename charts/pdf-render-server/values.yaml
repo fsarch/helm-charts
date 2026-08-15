@@ -71,10 +71,6 @@ env:
   port: "3000"
   # -- Path inside the container the rendered config.yml is mounted at.
   configFilePath: /etc/pdf-render-server/config.yml
-  # -- OIDC discovery URL used to validate/obtain tokens.
-  openIdConnectDiscoveryUrl: "https://login.beesblog.de/.well-known/openid-configuration"
-  # -- OIDC client id used by the bundled Swagger UI.
-  openIdConnectClientId: "swagger"
 
 # -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
 extraEnv: []
@@ -90,12 +86,20 @@ configMap:
 # -- config.yml contents, rendered from structured values below.
 # Set `config.raw` to a literal YAML/string block to bypass the structured
 # values entirely and use it verbatim as config.yml.
+#
+# Note: the app reads the OIDC discovery URL and client id from config.yml
+# (auth.discoveryUrl / auth.clientId) - they are NOT read from environment
+# variables, so there is no separate `env.*` setting for them.
 config:
   raw: ""
 
   auth:
     type: jwt-jwk
     jwkUrl: "https://login.beesblog.de/protocol/openid-connect/certs"
+    # -- OIDC discovery URL used to validate/obtain tokens.
+    discoveryUrl: "https://login.beesblog.de/.well-known/openid-configuration"
+    # -- OIDC client id used by the bundled Swagger UI.
+    clientId: "swagger"
 
   uac:
     type: static

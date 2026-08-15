@@ -37,12 +37,11 @@ and only pass `--namespace`.
 | `containerPort` | Port the container listens on. | `3000` |
 | `env.port` | `PORT` env var (should match `containerPort`). | `"3000"` |
 | `env.configFilePath` | Mount path for the rendered `config.yml` (`CONFIG_FILE_PATH`). | `/etc/pdf-render-server/config.yml` |
-| `env.openIdConnectDiscoveryUrl` | `OPENID_CONNECT_DISCOVERY_URL` env var. | `https://login.beesblog.de/.well-known/openid-configuration` |
-| `env.openIdConnectClientId` | `OPENID_CONNECT_CLIENT_ID` env var. | `swagger` |
 | `extraEnv` | Additional raw `EnvVar` entries appended to the container. | `[]` |
 | `configMap.create` | Whether to render the ConfigMap holding `config.yml`. Disable to bring your own and set `env.configFilePath` accordingly. | `true` |
 | `configMap.nameOverride` | Overrides the ConfigMap name (`<fullname>-config` by default). | `""` |
-| `config.auth` / `config.uac` | Structured `auth:` / `uac:` sections rendered into `config.yml`. | see `values.yaml` |
+| `config.auth` | Structured `auth:` section rendered into `config.yml`, incl. `discoveryUrl` / `clientId` for the OIDC login used by the bundled Swagger UI. **Note:** the app reads these from `config.yml`, not from environment variables. | see `values.yaml` |
+| `config.uac` | Structured `uac:` section (static user/permission list) rendered into `config.yml`. | see `values.yaml` |
 | `config.raw` | Literal `config.yml` content; overrides `config.auth`/`config.uac` when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |
@@ -63,6 +62,8 @@ config:
   auth:
     type: jwt-jwk
     jwkUrl: https://login.example.com/protocol/openid-connect/certs
+    discoveryUrl: https://login.example.com/.well-known/openid-configuration
+    clientId: swagger
   uac:
     type: static
     users:
