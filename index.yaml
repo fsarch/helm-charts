@@ -1,0 +1,27 @@
+apiVersion: v1
+entries:
+  pdf-render-server:
+  - apiVersion: v2
+    appVersion: 0.0.3
+    created: "2026-08-15T16:53:11.524928153Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch pdf-render-server
+    digest: e2daf0fe244587d0f406526f3fb5dd15f1ee6678c7e2e30602e9955a5278605d
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - pdf
+    - pdf-render-server
+    maintainers:
+    - name: fsarch
+    name: pdf-render-server
+    sources:
+    - https://gitlab.com/fsarch-infrastructure/beesblog/pdf-render-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/pdf-render-server-0.0.3/pdf-render-server-0.0.3.tgz
+    version: 0.0.3
+generated: "2026-08-15T16:53:11.524932334Z"
