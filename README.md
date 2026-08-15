@@ -24,6 +24,20 @@ the symlink transparently.
 
 ## Usage
 
+Once published (see below), add the repo once and install from it like any
+other Helm repo:
+
+```sh
+helm repo add fsarch https://fsarch.github.io/helm-charts
+helm repo update
+helm install <release-name> fsarch/<chart-name> \
+  --namespace <namespace> --create-namespace \
+  --values my-values.yaml
+```
+
+For local development against a checkout of this repo, install straight from
+the chart directory instead:
+
 ```sh
 helm upgrade --install <release-name> ./charts/<chart-name> \
   --namespace <namespace> --create-namespace \
@@ -38,3 +52,29 @@ See each chart's own `README.md` for its configurable values.
 helm lint charts/pdf-render-server
 helm template charts/pdf-render-server
 ```
+
+## Releasing / publishing
+
+Charts are published to a classic Helm repo served via GitHub Pages, using
+[`helm/chart-releaser-action`](https://github.com/helm/chart-releaser-action)
+(`.github/workflows/release-charts.yaml`, configured via `cr.yaml`). On every
+push to `main` that touches `charts/**`, it packages each chart whose
+`Chart.yaml` `version` hasn't been released yet, attaches the `.tgz` to a
+GitHub Release, and updates `index.yaml` on the `gh-pages` branch.
+
+**One-time setup** (not yet done for this repo):
+
+1. Push this repo to `origin` (`git push -u origin main`).
+2. In GitHub repo Settings → Actions → General → Workflow permissions, make
+   sure "Read and write permissions" is selected (needed for the action to
+   push the `gh-pages` branch and create releases via the default
+   `GITHUB_TOKEN`).
+3. Push once so the workflow runs and creates the `gh-pages` branch.
+4. In GitHub repo Settings → Pages, set Source to "Deploy from a branch" and
+   pick the `gh-pages` branch, `/ (root)` folder. The repo then becomes
+   reachable at `https://fsarch.github.io/helm-charts`.
+
+**Every release after that**: bump `version:` in the chart's `Chart.yaml`
+(and `appVersion:` if the app image changed) and push/merge to `main` - the
+workflow does the rest. Chart versions are immutable once released; a
+version that was already published is skipped, not overwritten.

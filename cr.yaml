@@ -1,0 +1,6 @@
+# Config for helm/chart-releaser (cr), used by .github/workflows/release-charts.yaml.
+# See https://github.com/helm/chart-releaser#configuration for all options.
+
+# Don't fail the run when a chart version was already released (e.g. reruns,
+# or a push that only touches an unrelated chart).
+skip-existing: true
