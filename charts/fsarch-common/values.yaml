@@ -1,0 +1,7 @@
+# fsarch-common is a library chart: it has no resources or defaults of its
+# own. Its named templates (`fsarch-common.*`) are `include`d from a
+# consuming chart's own templates and read directly from *that chart's*
+# .Values - so this file only documents the values contract a consuming
+# chart's own values.yaml is expected to implement. See
+# charts/pdf-render-server/values.yaml for a chart that implements it, and
+# README.md in this directory for how to wire a new chart up to it.

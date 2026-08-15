@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "pdf-render-server.name" -}}
+{{- define "fsarch-common.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 Truncated at 63 chars because some Kubernetes name fields are limited to this
 (by the DNS naming spec).
 */}}
-{{- define "pdf-render-server.fullname" -}}
+{{- define "fsarch-common.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,23 +26,23 @@ Truncated at 63 chars because some Kubernetes name fields are limited to this
 {{/*
 Resolve the target namespace: explicit override wins, otherwise the release namespace.
 */}}
-{{- define "pdf-render-server.namespace" -}}
+{{- define "fsarch-common.namespace" -}}
 {{- default .Release.Namespace .Values.namespace.name }}
 {{- end }}
 
 {{/*
 Chart name and version as used by the chart label.
 */}}
-{{- define "pdf-render-server.chart" -}}
+{{- define "fsarch-common.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "pdf-render-server.labels" -}}
-helm.sh/chart: {{ include "pdf-render-server.chart" . }}
-{{ include "pdf-render-server.selectorLabels" . }}
+{{- define "fsarch-common.labels" -}}
+helm.sh/chart: {{ include "fsarch-common.chart" . }}
+{{ include "fsarch-common.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -55,28 +55,28 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "pdf-render-server.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "pdf-render-server.name" . }}
+{{- define "fsarch-common.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "fsarch-common.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 ConfigMap name
 */}}
-{{- define "pdf-render-server.configMapName" -}}
+{{- define "fsarch-common.configMapName" -}}
 {{- if .Values.configMap.nameOverride }}
 {{- .Values.configMap.nameOverride }}
 {{- else }}
-{{- printf "%s-config" (include "pdf-render-server.fullname" .) }}
+{{- printf "%s-config" (include "fsarch-common.fullname" .) }}
 {{- end }}
 {{- end }}
 
 {{/*
 ServiceAccount name
 */}}
-{{- define "pdf-render-server.serviceAccountName" -}}
+{{- define "fsarch-common.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "pdf-render-server.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "fsarch-common.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

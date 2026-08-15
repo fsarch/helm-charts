@@ -13,3 +13,7 @@ keywords:
   - pdf-render-server
 maintainers:
   - name: fsarch
+dependencies:
+  - name: fsarch-common
+    version: "0.1.0"
+    repository: "file://../fsarch-common"

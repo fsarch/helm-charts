@@ -1,0 +1,7 @@
+apiVersion: v2
+name: fsarch-common
+description: Shared Helm library with the common Deployment/Service/ServiceAccount/Namespace/Ingress schema used by (most) fsarch application charts
+type: library
+version: 0.1.0
+maintainers:
+  - name: fsarch

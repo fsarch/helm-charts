@@ -5,6 +5,11 @@ Kubernetes manifests in the
 [pdf-render-server](https://gitlab.com/fsarch-infrastructure/beesblog/pdf-render-server)
 repository (`k8s/namespace.yaml`, `configmap.yaml`, `deployment.yaml`, `service.yaml`).
 
+The Deployment/Service/ServiceAccount/Namespace/Ingress templates are just
+thin wrappers around the [`fsarch-common`](../fsarch-common) library chart
+(see `templates/*.yaml`); only `templates/configmap.yaml` (the `config.yml`
+auth/uac rendering) is specific to this app.
+
 ## Installing
 
 ```sh
