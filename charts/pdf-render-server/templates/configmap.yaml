@@ -16,7 +16,12 @@ data:
     {{- .Values.config.raw | nindent 4 }}
     {{- else }}
     auth:
-      {{- toYaml .Values.config.auth | nindent 6 }}
+      type: {{ .Values.config.auth.type | quote }}
+      {{- if eq .Values.config.auth.type "jwt-jwk" }}
+      jwkUrl: {{ .Values.config.auth.jwkUrl | quote }}
+      {{- else if eq .Values.config.auth.type "oidc" }}
+      discovery_url: {{ .Values.config.auth.discoveryUrl | quote }}
+      {{- end }}
 
     uac:
       {{- toYaml .Values.config.uac | nindent 6 }}

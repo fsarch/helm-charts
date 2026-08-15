@@ -86,20 +86,20 @@ configMap:
 # -- config.yml contents, rendered from structured values below.
 # Set `config.raw` to a literal YAML/string block to bypass the structured
 # values entirely and use it verbatim as config.yml.
-#
-# Note: the app reads the OIDC discovery URL and client id from config.yml
-# (auth.discoveryUrl / auth.clientId) - they are NOT read from environment
-# variables, so there is no separate `env.*` setting for them.
 config:
   raw: ""
 
+  # auth.type selects which auth scheme is rendered into config.yml; the two
+  # schemas are mutually exclusive, only the fields for the active type are
+  # rendered:
+  #   - type: jwt-jwk -> renders auth.jwkUrl as jwkUrl
+  #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
   auth:
     type: jwt-jwk
+    # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
     jwkUrl: "https://login.beesblog.de/protocol/openid-connect/certs"
-    # -- OIDC discovery URL used to validate/obtain tokens.
-    discoveryUrl: "https://login.beesblog.de/.well-known/openid-configuration"
-    # -- OIDC client id used by the bundled Swagger UI.
-    clientId: "swagger"
+    # -- OIDC discovery URL used to validate tokens when type is "oidc".
+    discoveryUrl: ""
 
   uac:
     type: static

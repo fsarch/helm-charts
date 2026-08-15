@@ -40,7 +40,9 @@ and only pass `--namespace`.
 | `extraEnv` | Additional raw `EnvVar` entries appended to the container. | `[]` |
 | `configMap.create` | Whether to render the ConfigMap holding `config.yml`. Disable to bring your own and set `env.configFilePath` accordingly. | `true` |
 | `configMap.nameOverride` | Overrides the ConfigMap name (`<fullname>-config` by default). | `""` |
-| `config.auth` | Structured `auth:` section rendered into `config.yml`, incl. `discoveryUrl` / `clientId` for the OIDC login used by the bundled Swagger UI. **Note:** the app reads these from `config.yml`, not from environment variables. | see `values.yaml` |
+| `config.auth.type` | Auth scheme rendered into `config.yml`'s `auth:` section: `jwt-jwk` or `oidc`. Only the field(s) for the active type are rendered. | `jwt-jwk` |
+| `config.auth.jwkUrl` | JWK endpoint, rendered as `auth.jwkUrl` when `config.auth.type` is `jwt-jwk`. | see `values.yaml` |
+| `config.auth.discoveryUrl` | OIDC discovery URL, rendered as `auth.discovery_url` when `config.auth.type` is `oidc`. | `""` |
 | `config.uac` | Structured `uac:` section (static user/permission list) rendered into `config.yml`. | see `values.yaml` |
 | `config.raw` | Literal `config.yml` content; overrides `config.auth`/`config.uac` when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
@@ -62,14 +64,29 @@ config:
   auth:
     type: jwt-jwk
     jwkUrl: https://login.example.com/protocol/openid-connect/certs
-    discoveryUrl: https://login.example.com/.well-known/openid-configuration
-    clientId: swagger
   uac:
     type: static
     users:
       - user_id: "11111111-1111-1111-1111-111111111111"
         permissions:
           - render_pdf
+```
+
+### Example: using OIDC discovery instead of a static JWK URL
+
+```yaml
+config:
+  auth:
+    type: oidc
+    discoveryUrl: https://login.example.com/.well-known/openid-configuration
+```
+
+renders:
+
+```yaml
+auth:
+  type: "oidc"
+  discovery_url: "https://login.example.com/.well-known/openid-configuration"
 ```
 
 ### Example: bringing your own ConfigMap
