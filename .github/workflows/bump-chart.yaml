@@ -1,0 +1,93 @@
+name: Bump chart version on app release
+
+# Generic across every chart in this repo - triggered by any fsarch app
+# repo's image-build workflow via a repository_dispatch call whenever a
+# stable (non-prerelease) release tag is published there. Payload:
+# { "version": "0.0.3" }.
+#
+# The chart to bump is derived from the event_type itself, which by
+# convention is "<chart-name>-released" (e.g. "pdf-render-server-released"
+# bumps charts/pdf-render-server, "metric-server-released" bumps
+# charts/metric-server). No `types:` filter is declared on purpose - per
+# GitHub's docs, omitting it makes repository_dispatch match *any*
+# event_type, so a brand new chart's app repo only needs to start sending
+# "<its-chart-name>-released" (see metric-server's .github/workflows/image.yml
+# for a working example of the sending side) - nothing needs to change here.
+on:
+  repository_dispatch: {}
+
+# contents: write - to commit and push the version bump directly to main.
+# actions: write  - to explicitly dispatch release-charts.yaml afterwards
+#   (a push made with this workflow's own GITHUB_TOKEN does NOT trigger
+#   other workflows' `push` events, so we can't just rely on that).
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine chart from event type
+        id: chart
+        env:
+          EVENT_TYPE: ${{ github.event.action }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_TYPE}" != *-released ]]; then
+            echo "::error::event_type '${EVENT_TYPE}' doesn't match the '<chart-name>-released' convention" >&2
+            exit 1
+          fi
+          CHART="${EVENT_TYPE%-released}"
+          if [[ ! -f "charts/${CHART}/Chart.yaml" ]]; then
+            echo "::error::charts/${CHART}/Chart.yaml does not exist (event_type: ${EVENT_TYPE})" >&2
+            exit 1
+          fi
+          echo "name=${CHART}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Chart.yaml
+        env:
+          CHART: ${{ steps.chart.outputs.name }}
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${VERSION}" ]]; then
+            echo "::error::client_payload.version is empty" >&2
+            exit 1
+          fi
+          sed -i "s/^version: .*/version: ${VERSION}/" "charts/${CHART}/Chart.yaml"
+          sed -i "s/^appVersion: .*/appVersion: \"${VERSION}\"/" "charts/${CHART}/Chart.yaml"
+
+      - name: Commit and push
+        id: commit
+        env:
+          CHART: ${{ steps.chart.outputs.name }}
+          VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "charts/${CHART}/Chart.yaml already at ${VERSION}, nothing to do"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add "charts/${CHART}/Chart.yaml"
+          git commit -m "chore(${CHART}): bump chart to ${VERSION}"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger chart release
+        # See the permissions comment above: our own push doesn't trigger
+        # release-charts.yaml's `push` event, so dispatch it explicitly.
+        if: success() && steps.commit.outputs.pushed == 'true'
+        run: |
+          curl -sSf -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/release-charts.yaml/dispatches" \
+            -d '{"ref":"main"}'

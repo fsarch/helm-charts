@@ -94,10 +94,13 @@ reference example to copy from:
    `charts/<name>/**` (see below) - no changes needed to that workflow itself.
 
 If the new service should also auto-bump on its own app repo's releases like
-`pdf-render-server` does, add a chart-specific workflow modeled on
-`bump-pdf-render-server.yaml` (new `repository_dispatch` event type, new
-`sed` targets) rather than generalizing that one - it intentionally hardcodes
-`pdf-render-server`'s path.
+`pdf-render-server` and `metric-server` do, no changes are needed here -
+`bump-chart.yaml` is generic across every chart (see below). Just make the
+new app repo's image-build workflow send a `repository_dispatch` with
+`event_type: "<name>-released"` and `client_payload: {"version": "..."}` on
+stable release tags, using the `HELM_CHARTS_DISPATCH_TOKEN` secret (copy
+`metric-server`'s `.github/workflows/image.yml` "notify helm-charts of the
+new release" step).
 
 ### CI/CD: release pipeline
 
@@ -111,19 +114,25 @@ Two workflows in `.github/workflows/`:
   Chart versions are immutable once released - bump `version:` (and
   `appVersion:` if the app image changed) to publish again.
 
-- **`bump-pdf-render-server.yaml`**: listens for a
-  `pdf-render-server-released` `repository_dispatch` event (sent by the
-  `fsarch/pdf-render-server` app repo's image-build workflow on stable,
-  non-prerelease release tags, via a `HELM_CHARTS_DISPATCH_TOKEN` secret
-  there), bumps `charts/pdf-render-server/Chart.yaml`'s `version` and
-  `appVersion` to match, and pushes to `main`.
+- **`bump-chart.yaml`**: generic across every chart in this repo - listens
+  for **any** `repository_dispatch` event (no `types:` filter; GitHub
+  matches every custom `event_type` when it's omitted) sent by an fsarch app
+  repo's image-build workflow on stable, non-prerelease release tags, via a
+  `HELM_CHARTS_DISPATCH_TOKEN` secret there (e.g.
+  `fsarch/pdf-render-server`, `fsarch/metric-server` - see the latter's
+  `.github/workflows/image.yml` for the sending side). It derives the chart
+  to bump from the event type itself, by convention `<chart-name>-released`
+  (e.g. `metric-server-released` → `charts/metric-server`), bumps that
+  chart's `Chart.yaml` `version`/`appVersion` to `client_payload.version`,
+  and pushes to `main`. Onboarding a new chart to this needs **no edit here**
+  - only the new app repo's dispatch call, following the naming convention.
 
 **Two gotchas baked into this pipeline, worth knowing before touching either
 workflow:**
 
 1. A push made with a workflow's own `GITHUB_TOKEN` does **not** trigger
    other workflows' `push` events (GitHub's anti-recursion safeguard). So
-   `bump-pdf-render-server.yaml` can't just rely on its push to fire
+   `bump-chart.yaml` can't just rely on its push to fire
    `release-charts.yaml` - it explicitly dispatches it via the REST API
    (`.../actions/workflows/release-charts.yaml/dispatches`) after a
    successful push, which is why `release-charts.yaml` also declares
