@@ -9,6 +9,7 @@ Helm charts for fsarch services.
 | [`fsarch-common`](charts/fsarch-common) | Library chart with the shared Deployment/Service/ServiceAccount/Namespace/Ingress schema used by (most) fsarch application charts. Not deployable on its own. |
 | [`pdf-render-server`](charts/pdf-render-server) | PDF rendering service ([source](https://gitlab.com/fsarch-infrastructure/beesblog/pdf-render-server)) |
 | [`metric-server`](charts/metric-server) | Metrics storage/query service ([source](https://github.com/fsarch/metric-server)) |
+| [`image-server`](charts/image-server) | Image resizing/caching service ([source](https://github.com/michael-braun/image-server)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see

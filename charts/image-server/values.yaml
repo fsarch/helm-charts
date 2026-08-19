@@ -1,0 +1,254 @@
+# -- Default values for the image-server chart.
+# Declare variables to be passed into your templates.
+
+# -- Overrides the name used to build resource names (defaults to the chart name).
+nameOverride: ""
+# -- Overrides the full resource name (defaults to "<release name>-<chart name>").
+fullnameOverride: ""
+
+namespace:
+  # -- Whether the chart should create the target Namespace itself.
+  # Set to false if the namespace already exists / is managed elsewhere.
+  create: false
+  # -- Namespace to deploy the resources into. Defaults to the release namespace
+  # (`.Release.Namespace`, i.e. whatever `--namespace` / `-n` was set to) when empty.
+  name: ""
+
+# -- Extra labels applied to every resource created by this chart.
+commonLabels: {}
+
+# -- Extra annotations applied to every resource created by this chart.
+commonAnnotations: {}
+
+replicaCount: 1
+
+# -- Number of old ReplicaSets to retain for the Deployment.
+revisionHistoryLimit: 3
+
+image:
+  repository: docker.io/fsarch/image-server
+  pullPolicy: Always
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# -- Secrets used to pull the image from a private registry.
+imagePullSecrets: []
+
+# -- Extra labels for the Pod template.
+podLabels: {}
+
+# -- Extra annotations for the Pod template.
+podAnnotations: {}
+
+podSecurityContext: {}
+# runAsNonRoot: true
+# runAsUser: 1000
+
+securityContext: {}
+# readOnlyRootFilesystem: true
+# allowPrivilegeEscalation: false
+
+serviceAccount:
+  # -- Whether a ServiceAccount should be created.
+  create: false
+  # -- Name of the ServiceAccount to use. If not set and `create` is true, a name is generated.
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  # -- Additional annotations for the Service.
+  annotations: {}
+
+# -- Container port the application listens on.
+containerPort: 8080
+
+# -- application env vars managed via well-known values below.
+# Set to "" to omit an env var entirely.
+env:
+  # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
+  port: "8080"
+  # -- Path inside the container the rendered config.yml is mounted at.
+  configFilePath: /etc/image-server/config.yml
+
+# -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
+extraEnv: []
+# - name: LOG_LEVEL
+#   value: debug
+
+configMap:
+  # -- Whether to create the ConfigMap holding config.yml. Disable to bring your own.
+  create: true
+  # -- Overrides the ConfigMap name (defaults to "<fullname>-config").
+  nameOverride: ""
+
+# -- config.yml contents, rendered from structured values below.
+# Set `config.raw` to a literal YAML/string block to bypass the structured
+# values entirely and use it verbatim as config.yml.
+#
+# Only `auth`/`uac`/`database` (the parts with a mutually-exclusive upstream
+# schema per selected `type`, same as pdf-render-server/metric-server) are
+# modeled as dedicated keys here. Everything else image-server's config.yml
+# has (`images.presets`, `naming`, `storage`, `caching`, `signed_urls`) is
+# too shaped-by-use-case to be worth a bespoke values schema, so it's a
+# single freeform `config.extra` map that's rendered into config.yml as-is -
+# see STORAGE.md in https://github.com/michael-braun/image-server for the
+# full `storage.data`/`storage.cache` schema (filesystem path string, or
+# `{type: filesystem|s3, config: {...}}`).
+config:
+  raw: ""
+
+  # auth.type selects which auth scheme is rendered into config.yml; the two
+  # schemas are mutually exclusive, only the fields for the active type are
+  # rendered:
+  #   - type: jwt-jwk -> renders auth.jwkUrl as jwkUrl
+  #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
+  auth:
+    type: jwt-jwk
+    # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
+    jwkUrl: "https://login.example.com/protocol/openid-connect/certs"
+    # -- OIDC discovery URL used to validate tokens when type is "oidc".
+    discoveryUrl: ""
+
+  uac:
+    type: static
+    users:
+      - user_id: "86f01463-2952-4a7c-8d81-094561d110f0"
+        permissions:
+          - manage_images
+
+  # database.type selects which schema is rendered into config.yml's
+  # `database:` section (image-server only supports sqlite/cockroachdb, no
+  # plain "postgres" type); only the field(s) for the active type are
+  # rendered:
+  #   - type: sqlite      -> renders database.database (file path) only
+  #   - type: cockroachdb -> renders host/port/username/password/ssl
+  #
+  # sqlite (the default) needs its file to persist across restarts, same as
+  # config.extra.storage below when using filesystem storage - wire a PVC via
+  # extraVolumes/extraVolumeMounts for real deployments.
+  database:
+    type: sqlite
+    database: /data/image-server.sqlite3
+    host: ""
+    port: 26257
+    username: ""
+    # -- Database password. Sensitive - prefer setting via --set or a
+    # non-committed values file rather than checking it in.
+    password: ""
+    ssl:
+      rejectUnauthorized: true
+
+  # -- Freeform passthrough for the rest of config.yml - merged in verbatim
+  # via `toYaml`. Defaults below mirror image-server's own example config.
+  extra:
+    images:
+      presets:
+        - alias: small
+          width: 256
+          height: 256
+          algorithm: contain
+          conversion: on_demand
+          cached: true
+        - alias: medium
+          width: 512
+          height: 512
+          algorithm: contain
+          conversion: on_demand
+          cached: true
+        - alias: large
+          width: 1024
+          height: 1024
+          algorithm: contain
+          conversion: on_demand
+          cached: true
+        - alias: xlarge
+          width: 2048
+          height: 2048
+          algorithm: contain
+          conversion: on_demand
+          cached: true
+        - alias: xxlarge
+          width: 4096
+          height: 4096
+          algorithm: contain
+          conversion: on_demand
+          cached: true
+
+    naming:
+      type: named
+      path: "##id##_##preset_alias##.##ext##"
+
+    # -- Filesystem paths by default (ephemeral unless backed by a PVC via
+    # extraVolumes/extraVolumeMounts) - switch to S3 per STORAGE.md for
+    # production.
+    storage:
+      data: /data
+      cache: /cache
+
+    caching:
+      memory:
+        enabled: true
+        caches:
+          resolve_path:
+            ttl: 60000
+          image_data:
+            ttl: "Infinity"
+      client:
+        enabled: true
+        options:
+          max_age: 300000
+          s_max_age: 3600000
+
+    # signed_urls:
+    #   enabled: true
+    #   keys:
+    #     - id: "475c5ebd-fbe5-4b2a-afd1-b58883cb88b0"
+    #       algorithm: HMAC-SHA256
+    #       secret: "<set via --set or a non-committed values file>"
+
+livenessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+
+readinessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# -- Extra volumes appended to the Deployment's pod spec.
+extraVolumes: []
+
+# -- Extra volume mounts appended to the image-server container.
+extraVolumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: image-server.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
