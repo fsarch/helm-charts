@@ -1,0 +1,188 @@
+# -- Default values for the dashboard chart.
+# Declare variables to be passed into your templates.
+
+# -- Overrides the name used to build resource names (defaults to the chart name).
+nameOverride: ""
+# -- Overrides the full resource name (defaults to "<release name>-<chart name>").
+fullnameOverride: ""
+
+namespace:
+  # -- Whether the chart should create the target Namespace itself.
+  # Set to false if the namespace already exists / is managed elsewhere.
+  create: false
+  # -- Namespace to deploy the resources into. Defaults to the release namespace
+  # (`.Release.Namespace`, i.e. whatever `--namespace` / `-n` was set to) when empty.
+  name: ""
+
+# -- Extra labels applied to every resource created by this chart.
+commonLabels: {}
+
+# -- Extra annotations applied to every resource created by this chart.
+commonAnnotations: {}
+
+replicaCount: 1
+
+# -- Number of old ReplicaSets to retain for the Deployment.
+revisionHistoryLimit: 3
+
+image:
+  repository: docker.io/fsarch/dashboard
+  pullPolicy: Always
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# -- Secrets used to pull the image from a private registry.
+imagePullSecrets: []
+
+# -- Extra labels for the Pod template.
+podLabels: {}
+
+# -- Extra annotations for the Pod template.
+podAnnotations: {}
+
+podSecurityContext: {}
+# runAsNonRoot: true
+# runAsUser: 1000
+
+securityContext: {}
+# readOnlyRootFilesystem: true
+# allowPrivilegeEscalation: false
+
+serviceAccount:
+  # -- Whether a ServiceAccount should be created.
+  create: false
+  # -- Name of the ServiceAccount to use. If not set and `create` is true, a name is generated.
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+  # -- Additional annotations for the Service.
+  annotations: {}
+
+# -- Container port the application listens on.
+containerPort: 3000
+
+# -- application env vars managed via well-known values below.
+# Set to "" to omit an env var entirely.
+env:
+  # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
+  port: "3000"
+  # -- Path inside the container the rendered config.yml is mounted at.
+  configFilePath: /etc/dashboard/config.yml
+
+# -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
+#
+# Unlike pdf-render-server/metric-server/image-server/frontend-server,
+# dashboard has no @fsarch/server-style `auth:`/`database:` config.yml
+# section at all - it's a Next.js app, auth is entirely wired via NextAuth +
+# Keycloak env vars instead. All six are required for the app to work;
+# fsarch-common has no dedicated slot for them (only `env.port`/
+# `env.configFilePath` are first-class), so they're pre-populated here
+# rather than left as an empty example like the other charts' `extraEnv`.
+extraEnv:
+  # -- Public URL the dashboard is reachable at (NextAuth callback base).
+  - name: NEXTAUTH_URL
+    value: "https://dashboard.example.com"
+  # -- Secret NextAuth uses to sign/encrypt session tokens. Sensitive -
+  # prefer setting via --set or a non-committed values file.
+  - name: NEXTAUTH_SECRET
+    value: ""
+  # -- OIDC issuer URL of the Keycloak realm used for login.
+  - name: AUTH_ISSUER
+    value: "https://login.example.com/realms/example"
+  - name: AUTH_CLIENT_ID
+    value: "dashboard"
+  # -- Sensitive - prefer setting via --set or a non-committed values file.
+  - name: AUTH_CLIENT_SECRET
+    value: ""
+  # -- HMAC secret used internally (e.g. signed addon/custom-app payloads).
+  # Sensitive - prefer setting via --set or a non-committed values file.
+  - name: CRYPTO_SECRET
+    value: ""
+
+configMap:
+  # -- Whether to create the ConfigMap holding config.yml. Disable to bring your own.
+  create: true
+  # -- Overrides the ConfigMap name (defaults to "<fullname>-config").
+  nameOverride: ""
+
+# -- config.yml contents, rendered from structured values below.
+# Set `config.raw` to a literal YAML/string block to bypass the structured
+# values entirely and use it verbatim as config.yml.
+#
+# None of dashboard's config.yml sections have a mutually-exclusive
+# upstream schema per `type` the way auth/database do on the other charts -
+# it's all freeform (which backend services exist, role->permission
+# mappings, theming), so every key here is rendered via `toYaml` as-is.
+# Defaults are intentionally empty/inert (no services, no granted
+# permissions) - this is meant to be filled in per deployment, see the
+# README for a full worked example.
+config:
+  raw: ""
+
+  # -- List of federated backend services the dashboard talks to
+  # (`{type, id, url, name?, path?, worker_url?}` per entry - `type` selects
+  # which UI module renders it, `id` must be unique per `type`).
+  services: []
+
+  # -- Default `id` per service `type`, used wherever the UI needs "the"
+  # instance of a type without the user picking one explicitly.
+  defaults: {}
+
+  # -- `{primary_color, background_color}` (hex); omitted/empty falls back
+  # to the app's own built-in defaults.
+  theme: {}
+
+  # -- Token-based (Keycloak realm role -> permission) access control.
+  # Empty mappings means nobody gets any permission - see the README for a
+  # realistic example.
+  uac:
+    type: token-based
+    mappings: []
+
+livenessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+
+readinessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# -- Extra volumes appended to the Deployment's pod spec.
+extraVolumes: []
+
+# -- Extra volume mounts appended to the dashboard container.
+extraVolumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: dashboard.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

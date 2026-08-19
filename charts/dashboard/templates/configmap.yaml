@@ -1,0 +1,30 @@
+{{- if .Values.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fsarch-common.configMapName" . }}
+  namespace: {{ include "fsarch-common.namespace" . }}
+  labels:
+    {{- include "fsarch-common.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config.yml: |
+    {{- if .Values.config.raw }}
+    {{- .Values.config.raw | nindent 4 }}
+    {{- else }}
+    services:
+      {{- toYaml .Values.config.services | nindent 6 }}
+
+    defaults:
+      {{- toYaml .Values.config.defaults | nindent 6 }}
+
+    theme:
+      {{- toYaml .Values.config.theme | nindent 6 }}
+
+    uac:
+      {{- toYaml .Values.config.uac | nindent 6 }}
+    {{- end }}
+{{- end }}
