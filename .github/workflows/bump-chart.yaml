@@ -48,7 +48,7 @@ jobs:
           fi
           echo "name=${CHART}" >> "$GITHUB_OUTPUT"
 
-      - name: Update Chart.yaml
+      - name: Update Chart.yaml and values.yaml
         env:
           CHART: ${{ steps.chart.outputs.name }}
           VERSION: ${{ github.event.client_payload.version }}
@@ -61,6 +61,18 @@ jobs:
           sed -i "s/^version: .*/version: ${VERSION}/" "charts/${CHART}/Chart.yaml"
           sed -i "s/^appVersion: .*/appVersion: \"${VERSION}\"/" "charts/${CHART}/Chart.yaml"
 
+          # Also pin values.yaml's image.tag to the released version, rather
+          # than relying on fsarch-common.deployment's `image.tag | default
+          # .Chart.AppVersion` fallback - keeps the tag actually deployed
+          # explicit in values.yaml even if that default ever changes.
+          VALUES_FILE="charts/${CHART}/values.yaml"
+          MATCHES=$(grep -c '^  tag: ' "${VALUES_FILE}")
+          if [[ "${MATCHES}" -ne 1 ]]; then
+            echo "::error::expected exactly one '  tag: ' line under image: in ${VALUES_FILE}, found ${MATCHES}" >&2
+            exit 1
+          fi
+          sed -i "s/^  tag: .*/  tag: \"${VERSION}\"/" "${VALUES_FILE}"
+
       - name: Commit and push
         id: commit
         env:
@@ -71,11 +83,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if git diff --quiet; then
-            echo "charts/${CHART}/Chart.yaml already at ${VERSION}, nothing to do"
+            echo "charts/${CHART} already at ${VERSION}, nothing to do"
             echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git add "charts/${CHART}/Chart.yaml"
+          git add "charts/${CHART}/Chart.yaml" "charts/${CHART}/values.yaml"
           git commit -m "chore(${CHART}): bump chart to ${VERSION}"
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
