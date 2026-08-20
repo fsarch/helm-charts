@@ -96,6 +96,31 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/frontend-server-0.0.0/frontend-server-0.0.0.tgz
     version: 0.0.0
+  function-gateway:
+  - apiVersion: v2
+    appVersion: 0.0.0
+    created: "2026-08-20T20:55:38.686006272Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch function-gateway
+    digest: a2885970b2058d4b9b039a68f75b3298f79aea385856de932fb1d6583f299c4e
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - functions
+    - gateway
+    - function-gateway
+    maintainers:
+    - name: fsarch
+    name: function-gateway
+    sources:
+    - https://github.com/fsarch/function-gateway
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/function-gateway-0.0.0/function-gateway-0.0.0.tgz
+    version: 0.0.0
   function-node-worker:
   - apiVersion: v2
     appVersion: 0.0.1
@@ -356,4 +381,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/pdf-render-server-0.0.1/pdf-render-server-0.0.1.tgz
     version: 0.0.1
-generated: "2026-08-20T20:40:07.260174424Z"
+generated: "2026-08-20T20:55:38.686017749Z"
