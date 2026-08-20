@@ -1,0 +1,43 @@
+{{- if .Values.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fsarch-common.configMapName" . }}
+  namespace: {{ include "fsarch-common.namespace" . }}
+  labels:
+    {{- include "fsarch-common.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config.yml: |
+    {{- if .Values.config.raw }}
+    {{- .Values.config.raw | nindent 4 }}
+    {{- else }}
+    auth:
+      type: {{ .Values.config.auth.type | quote }}
+      {{- if eq .Values.config.auth.type "jwt-jwk" }}
+      jwkUrl: {{ .Values.config.auth.jwkUrl | quote }}
+      {{- else if eq .Values.config.auth.type "static" }}
+      secret: {{ .Values.config.auth.secret | quote }}
+      users:
+        {{- toYaml .Values.config.auth.users | nindent 8 }}
+      {{- end }}
+
+    worker_auth:
+      type: {{ .Values.config.workerAuth.type | quote }}
+      token_endpoint: {{ .Values.config.workerAuth.tokenEndpoint | quote }}
+      client_id: {{ .Values.config.workerAuth.clientId | quote }}
+      client_secret: {{ .Values.config.workerAuth.clientSecret | quote }}
+
+    function_server:
+      type: {{ .Values.config.functionServer.type | quote }}
+      url: {{ .Values.config.functionServer.url | quote }}
+      auth:
+        type: {{ .Values.config.functionServer.auth.type | quote }}
+        token_endpoint: {{ .Values.config.functionServer.auth.tokenEndpoint | quote }}
+        client_id: {{ .Values.config.functionServer.auth.clientId | quote }}
+        client_secret: {{ .Values.config.functionServer.auth.clientSecret | quote }}
+    {{- end }}
+{{- end }}

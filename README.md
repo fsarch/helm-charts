@@ -13,6 +13,7 @@ Helm charts for fsarch services.
 | [`frontend-server`](charts/frontend-server) | Authenticated file-storage/serving service ([source](https://github.com/fsarch/frontend-server)) |
 | [`dashboard`](charts/dashboard) | Next.js frontend federating fsarch backend services behind one authenticated UI ([source](https://github.com/fsarch/dashboard)) |
 | [`function-server`](charts/function-server) | Worker-function dispatch service ([source](https://github.com/fsarch/function-server)) |
+| [`function-node-worker`](charts/function-node-worker) | Node.js worker that executes functions dispatched by `function-server` ([source](https://github.com/fsarch/function-node-worker)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see
