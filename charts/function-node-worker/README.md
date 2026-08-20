@@ -27,12 +27,6 @@ rendering) is specific to this app.
   `auth` block - not necessarily the same client as `worker_auth`, the app
   keeps them as two independent config blocks).
 
-**Note:** like `function-server`, `function-node-worker`'s
-`.github/workflows/image.yml` currently only builds `:latest` on push to
-`main` - no versioned tags, no `function-node-worker-released`
-repository_dispatch for `bump-chart.yaml` to react to. `image.tag` defaults
-to `"latest"` here accordingly rather than the chart `appVersion`.
-
 ## Installing
 
 ```sh
@@ -55,7 +49,7 @@ and only pass `--namespace`.
 | `commonLabels` / `commonAnnotations` | Extra labels/annotations merged onto every resource. | `{}` |
 | `replicaCount` | Deployment replica count. | `1` |
 | `revisionHistoryLimit` | ReplicaSets to retain. | `3` |
-| `image.repository` / `image.tag` / `image.pullPolicy` | Container image. | `docker.io/fsarch/function-node-worker`, `latest` (see note above), `Always` |
+| `image.repository` / `image.tag` / `image.pullPolicy` | Container image. | `docker.io/fsarch/function-node-worker`, chart `appVersion`, `Always` |
 | `imagePullSecrets` | Pull secrets for private registries. | `[]` |
 | `podLabels` / `podAnnotations` | Extra labels/annotations on the Pod template. | `{}` |
 | `podSecurityContext` / `securityContext` | Pod- / container-level `securityContext`. | `{}` |

@@ -1,4 +1,4 @@
-# -- Default values for the function-server chart.
+# -- Default values for the frontier-server chart.
 # Declare variables to be passed into your templates.
 
 # -- Overrides the name used to build resource names (defaults to the chart name).
@@ -26,7 +26,12 @@ replicaCount: 1
 revisionHistoryLimit: 3
 
 image:
-  repository: docker.io/fsarch/function-server
+  # -- This chart deploys apps/frontier-api from the fsarch/frontier-server
+  # monorepo (which also has apps/frontier-worker - see the sibling
+  # frontier-worker chart) - published as the fsarch/frontier-server image
+  # (matching the app repo's own name), one image per chart like everywhere
+  # else here.
+  repository: docker.io/fsarch/frontier-server
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -70,7 +75,7 @@ env:
   # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
   port: "8080"
   # -- Path inside the container the rendered config.yml is mounted at.
-  configFilePath: /etc/function-server/config.yml
+  configFilePath: /etc/frontier-server/config.yml
 
 # -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
 extraEnv: []
@@ -86,25 +91,29 @@ configMap:
 # -- config.yml contents, rendered from structured values below.
 # Set `config.raw` to a literal YAML/string block to bypass the structured
 # values entirely and use it verbatim as config.yml.
+#
+# Note: the app repo's example config.yml also has `remote-events`,
+# `function_server` and `function_worker` sections, but nothing in
+# apps/frontier-api's src actually reads them - same kind of dead leftover
+# config as function-node-worker's unused `uac`/`database` and
+# function-gateway's unused `function_server`. Intentionally omitted here;
+# use `config.raw` if you want to keep them for parity with the app repo's
+# own config.yml anyway.
 config:
   raw: ""
 
   # auth.type selects which auth scheme is rendered into config.yml's
   # `auth:` section - mutually exclusive, only the field(s) for the active
-  # type are rendered. Unlike pdf-render-server/metric-server/image-server
-  # (jwt-jwk/oidc only), function-server's own example configs use both
-  # jwt-jwk (real deployments) and static (its config.template.yml, for
-  # local/test use), so all three of @fsarch/server's auth types are
-  # supported here:
+  # type are rendered:
   #   - type: jwt-jwk -> renders auth.jwkUrl
   #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
   #   - type: static  -> renders auth.secret and auth.users (id/username/password)
   auth:
-    type: jwt-jwk
+    type: oidc
     # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
-    jwkUrl: "https://login.example.com/protocol/openid-connect/certs"
+    jwkUrl: ""
     # -- OIDC discovery URL used to validate tokens when type is "oidc".
-    discoveryUrl: ""
+    discoveryUrl: "https://login.example.com/.well-known/openid-configuration"
     # -- Shared secret used to sign/verify tokens when type is "static".
     # Sensitive - prefer setting via --set or a non-committed values file.
     secret: ""
@@ -128,7 +137,7 @@ config:
   #   - type: postgres|cockroachdb -> renders host/port/username/password/ssl
   database:
     type: postgres
-    database: function-server
+    database: frontier-server
     host: ""
     port: 5432
     username: ""
@@ -138,15 +147,16 @@ config:
     ssl:
       rejectUnauthorized: true
 
-  # -- Freeform `worker.api` map - the backend services function-server
-  # calls out to when running its worker functions. Each entry is keyed by
-  # an arbitrary name and shaped by its `type` (`pdf-server`,
-  # `material-tracing-server`, `product-server` - which additionally needs
-  # `catalogId` -, `printer-server`, `metric-server`); rendered as-is via
-  # `toYaml`. Empty by default (inert) - see the README for a full example
-  # matching the app repo's own config.template.yml.
-  worker:
-    api: {}
+  # -- `workers.websocket:` - how frontier-worker instances authenticate
+  # their websocket connection back to this API (the shared secret must
+  # match the sibling frontier-worker chart's `extraEnv`'s
+  # `FRONTIER_WORKER_AUTH_TOKEN`) and how often they're expected to poll
+  # for config changes. Both fields required by the app.
+  workers:
+    websocket:
+      # -- Sensitive - prefer setting via --set or a non-committed values file.
+      authToken: ""
+      configCheckIntervalMs: 2000
 
 livenessProbe:
   enabled: true
@@ -173,7 +183,7 @@ resources:
 # -- Extra volumes appended to the Deployment's pod spec.
 extraVolumes: []
 
-# -- Extra volume mounts appended to the function-server container.
+# -- Extra volume mounts appended to the frontier-server container.
 extraVolumeMounts: []
 
 nodeSelector: {}
@@ -187,7 +197,7 @@ ingress:
   className: ""
   annotations: {}
   hosts:
-    - host: function-server.example.com
+    - host: frontier-server.example.com
       paths:
         - path: /
           pathType: Prefix

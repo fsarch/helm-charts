@@ -1,0 +1,31 @@
+{{- if .Values.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fsarch-common.configMapName" . }}
+  namespace: {{ include "fsarch-common.namespace" . }}
+  labels:
+    {{- include "fsarch-common.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  # Unlike every other chart here, this is NOT a full app config.yml - the
+  # app only ever reads a single optional `function_worker:` key from it
+  # (src/runtime/config-loader.ts), everything else about frontier-worker
+  # is configured via env vars (see values.yaml's extraEnv).
+  config.yml: |
+    {{- if .Values.config.raw }}
+    {{- .Values.config.raw | nindent 4 }}
+    {{- else }}
+    function_worker:
+      type: {{ .Values.config.functionWorker.type | quote }}
+      url: {{ .Values.config.functionWorker.url | quote }}
+      auth:
+        type: {{ .Values.config.functionWorker.auth.type | quote }}
+        token_endpoint: {{ .Values.config.functionWorker.auth.tokenEndpoint | quote }}
+        client_id: {{ .Values.config.functionWorker.auth.clientId | quote }}
+        client_secret: {{ .Values.config.functionWorker.auth.clientSecret | quote }}
+    {{- end }}
+{{- end }}
