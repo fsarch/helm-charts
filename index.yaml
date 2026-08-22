@@ -2,6 +2,29 @@ apiVersion: v1
 entries:
   dashboard:
   - apiVersion: v2
+    appVersion: 0.0.3
+    created: "2026-08-22T21:13:10.541396465Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch dashboard
+    digest: fd949082af553116daffc2bc86b661fdef7bb6fa200fc5825d28fca146abbd31
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - dashboard
+    - frontend
+    maintainers:
+    - name: fsarch
+    name: dashboard
+    sources:
+    - https://github.com/fsarch/dashboard
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/dashboard-0.0.3/dashboard-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.0.2
     created: "2026-08-20T04:51:22.136607654Z"
     dependencies:
@@ -595,4 +618,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/pdf-render-server-0.0.1/pdf-render-server-0.0.1.tgz
     version: 0.0.1
-generated: "2026-08-21T07:44:46.976039472Z"
+generated: "2026-08-22T21:13:10.541427513Z"
