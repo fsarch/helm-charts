@@ -17,6 +17,7 @@ Helm charts for fsarch services.
 | [`function-gateway`](charts/function-gateway) | Manages and executes remote functions via worker servers ([source](https://github.com/fsarch/function-gateway)) |
 | [`frontier-server`](charts/frontier-server) | Config/management API for frontier-worker fleets (monorepo app apps/frontier-api, published as fsarch/frontier-server; [source](https://github.com/fsarch/frontier-server)) |
 | [`frontier-worker`](charts/frontier-worker) | HTTP proxy worker driven by frontier-server's control plane ([source](https://github.com/fsarch/frontier-server)) |
+| [`material-tracing-server`](charts/material-tracing-server) | Material/parts traceability service ([source](https://github.com/fsarch/material-tracing-server)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see
