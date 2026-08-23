@@ -503,6 +503,29 @@ entries:
     version: 0.0.0
   material-tracing-server:
   - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2026-08-23T13:36:58.909077153Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch material-tracing-server
+    digest: d786701e769bbc785effcea8c261e984157d5027f085ee92efdb5d94305389eb
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - material-tracing
+    - material-tracing-server
+    maintainers:
+    - name: fsarch
+    name: material-tracing-server
+    sources:
+    - https://github.com/fsarch/material-tracing-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/material-tracing-server-0.0.1/material-tracing-server-0.0.1.tgz
+    version: 0.0.1
+  - apiVersion: v2
     appVersion: 0.0.0
     created: "2026-08-23T13:21:30.525919061Z"
     dependencies:
@@ -642,4 +665,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/pdf-render-server-0.0.1/pdf-render-server-0.0.1.tgz
     version: 0.0.1
-generated: "2026-08-23T13:21:30.525954654Z"
+generated: "2026-08-23T13:36:58.909107438Z"
