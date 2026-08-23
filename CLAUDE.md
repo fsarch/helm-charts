@@ -65,6 +65,100 @@ rendered:
 - `type: oidc` → renders `auth.discovery_url` (snake_case; note the
   mismatch with the chart's own camelCase `config.auth.discoveryUrl` value)
 
+### `config.yml` patterns across consumer charts
+
+Most consumer charts (`metric-server`, `frontend-server`, `function-server`,
+`function-gateway`, `frontier-server`, `material-tracing-server`, ...) are
+built on the shared `@fsarch/server` NestJS framework, which gives every one
+of them the same three config sections with the same mutually-exclusive
+`type`-selected rendering as `pdf-render-server`'s `auth` above:
+- `auth`: `jwt-jwk` (→ `jwkUrl`) / `oidc` (→ `discovery_url`) / `static` (→
+  `secret` + `users`). Some apps' own local Joi validation narrows this to
+  a subset (e.g. `frontend-server`/`function-node-worker` only accept
+  `jwt-jwk`/`static`, no `oidc`) - check the app's `configuration.ts` or
+  per-module `ModuleConfiguration.register(...)` validators, don't assume
+  all three are accepted just because the framework supports them.
+- `uac`: `static` (user id + permissions list) - no other type exists yet.
+- `database`: `sqlite` (→ `database` file path) / `postgres`|`cockroachdb`
+  (→ `host`/`port`/`database`/`username`/`password`/`ssl`). Some apps only
+  accept a subset here too (`image-server` has no plain `postgres`, only
+  `sqlite`/`cockroachdb`).
+
+Beyond those three, apps have their own bespoke sections with no `type`
+selector to branch on - too shaped-by-use-case for a bespoke values schema.
+The convention here is a **freeform passthrough** value rendered verbatim
+via `toYaml` (`image-server`'s `config.extra`, `function-server`'s
+`config.worker.api`, `dashboard`'s `config.services`/`config.uac.mappings`,
+`material-tracing-server`'s `config.customActions`) - default it to
+something inert (`{}`/`[]`) rather than guessing at a real deployment's
+values, and give a full worked example in the chart's README instead.
+
+Every chart also has a `config.raw` value that bypasses all of the above
+and is used verbatim as `config.yml` when non-empty - the universal escape
+hatch, keep it on every new chart even once it has structured values for
+everything else.
+
+**Before modeling any section as a dedicated values key, verify the app's
+own `src` actually reads it** - `grep` for
+`ModuleConfiguration.register(...)`/`configService.get(...)` for that
+top-level key. These app repos' checked-in example `config.yml`/
+`config.template.yml` files get copy-pasted between services a lot, and
+routinely carry sections nothing in that particular app's code ever reads
+(dead leftovers, not future functionality): `function-node-worker`'s
+`uac`/`database`, `function-gateway`'s `function_server`,
+`frontier-server`'s `remote-events`/`function_server`/`function_worker`,
+`material-tracing-server`'s `pdf_render`/`product_server`. Leave those out
+of the structured `config.*` values entirely (don't render them) and note
+in the chart's README *why* they're missing - `config.raw` is there for
+anyone who wants them anyway.
+
+### Apps that aren't `@fsarch/server`-based
+
+Not every app repo uses the framework above - `dashboard` (Next.js/NextAuth)
+and `frontier-worker` (a small standalone Node process, no NestJS/database
+at all) are architecturally their own thing. For these:
+- Figure out the real config surface from `process.env.*` usage in `src`
+  (`grep -rhoE "process\.env\.[A-Z_]+" src`), not from an assumed
+  `config.yml` shape.
+- `fsarch-common.deployment` hardcodes the env var names it sets to `PORT`
+  (from `env.port`) and `CONFIG_FILE_PATH` (from `env.configFilePath`,
+  only when `configMap.create` is also true). If the app reads a
+  differently-named var for either (e.g. `frontier-worker`'s
+  `FRONTIER_WORKER_PORT`), set the corresponding `env.*` value to `""` to
+  skip the unused var and add the real one via `extraEnv` instead - the
+  ConfigMap volume mount itself still works off `env.configFilePath`
+  regardless, so a stray unused `CONFIG_FILE_PATH` env var is harmless if
+  you need the mount but not that exact var name.
+- If `config.yml` is an optional feature rather than core to the app
+  working at all (`frontier-worker`'s single optional `function_worker:`
+  key), default `configMap.create: false` instead of `true` - don't force
+  a ConfigMap/ENV var/ volume mount on every install for something most
+  deployments don't need.
+- Pre-populate `extraEnv` with the app's *required* env vars (real-looking
+  placeholder values, empty for secrets) instead of leaving it as an empty
+  example - `fsarch-common` has no dedicated slot for them, and without
+  defaults the chart doesn't describe a working deployment at all
+  (`dashboard`'s NextAuth/Keycloak vars, `frontier-worker`'s control-plane
+  URL/auth token).
+
+### Monorepos / multi-deployable app repos
+
+`frontier-server` (`fsarch/frontier-server`) is one app repo that builds
+**two** separately-deployed apps (`apps/frontier-api`, `apps/frontier-worker`)
+- it gets **two** charts (`charts/frontier-server`, `charts/frontier-worker`),
+each with its own image repository, `Chart.yaml`, and independent
+versioning, exactly as if they were separate app repos. Don't try to share
+one image repo with tag suffixes (`:v1-api`/`:v1-worker`) or one chart with
+a mode switch - it breaks `bump-chart.yaml`'s naming convention (see below)
+and Helm's one-appVersion-per-chart model. The published image/chart name
+doesn't have to match the app's own directory name either (frontier-server's
+`apps/frontier-api` is intentionally published as `fsarch/frontier-server`/
+`charts/frontier-server`, to match the *repo's* name instead) - if an app
+repo's image-build workflow needs the same split, decouple the matrix
+key used for the Dockerfile path from the one used for the image name/
+`repository_dispatch` `event_type` (see `frontier-server`'s
+`docker-images.yml` for a worked example) rather than renaming directories.
+
 ### Adding a new service chart
 
 Full walkthrough with the exact template names: `charts/fsarch-common/README.md`
@@ -76,9 +170,15 @@ reference example to copy from:
    `charts/pdf-render-server/Chart.yaml`'s).
 2. Symlink the shared chart in rather than vendoring it:
    `ln -s ../../fsarch-common charts/<name>/charts/fsarch-common`.
-3. Write `values.yaml` implementing the values contract from
-   `charts/fsarch-common/README.md` (copy `charts/pdf-render-server/values.yaml`
-   as a starting point and adjust image/env/config for the new service).
+3. Read the app repo's `Dockerfile` (port, entrypoint), `package.json`
+   (framework/deps - `@fsarch/server` or not), `config/config.yml` +
+   `config.template.yml` if present, and `src/main.ts`/`app.module.ts` to
+   see what's actually wired up. Write `values.yaml` implementing the
+   values contract from `charts/fsarch-common/README.md` (copy
+   `charts/pdf-render-server/values.yaml` as a starting point and adjust
+   image/env/config for the new service) - see "`config.yml` patterns
+   across consumer charts" and "Apps that aren't `@fsarch/server`-based"
+   above for how to model its config section by section.
 4. Add thin wrapper templates that just `include` the shared ones -
    `deployment.yaml`, `service.yaml`, `serviceaccount.yaml`, `namespace.yaml`,
    `ingress.yaml`, `NOTES.txt` (see `charts/pdf-render-server/templates/` for
@@ -86,12 +186,33 @@ reference example to copy from:
    to). Only add real logic to `templates/` for things that are actually
    app-specific (e.g. a ConfigMap with app-specific content, as
    `pdf-render-server/templates/configmap.yaml` does).
-5. Verify with `helm lint charts/<name>` and `helm template
-   charts/<name>` (plus a few `--set` overrides touching the new bits).
+5. Verify: `helm lint charts/<name>`; `helm template charts/<name>` for the
+   defaults; then `helm template charts/<name> -f <overrides>` for each
+   `type` branch you added (every auth/database type, `config.raw`) to
+   confirm each renders valid, correctly-indented YAML - a bad `nindent` or
+   a missed `quote` only shows up once you actually exercise that branch.
 6. Add the chart to the table in the root `README.md`.
 7. Give it its own `version:`/`appVersion:` in `Chart.yaml`; it gets released
    independently by `release-charts.yaml` the next time `main` changes under
    `charts/<name>/**` (see below) - no changes needed to that workflow itself.
+
+**`image.tag` gotcha**: the default (`""`) falls back to `.Chart.AppVersion`
+via `fsarch-common.deployment`, which only points at something real once
+the app repo actually publishes a matching versioned tag. Check the app
+repo's image-build workflow before trusting the default - some
+(`function-server`, `function-node-worker`, historically) only ever push
+`:latest`, in which case set `image.tag: "latest"` explicitly in the
+chart's `values.yaml` (with a comment explaining why) instead, and switch
+it back to `""` once/if that workflow adds versioned-tag releases.
+
+**Don't assume the app repo's own image-build workflow is correct** just
+because it exists - these get copy-pasted between repos too and the
+`IMAGE=`/`event_type` variables are easy to leave pointing at the source
+repo (`function-gateway`'s `image.yml` was found pushing to
+`fsarch/frontend-server` and dispatching `frontend-server-released`,
+apparently copy-pasted from `frontend-server` and never adjusted). Read it
+rather than skimming the file name, and flag/fix mismatches with the repo
+name before wiring a chart's `image.repository` up to trust it.
 
 If the new service should also auto-bump on its own app repo's releases like
 `pdf-render-server` and `metric-server` do, no changes are needed here -
@@ -100,7 +221,12 @@ new app repo's image-build workflow send a `repository_dispatch` with
 `event_type: "<name>-released"` and `client_payload: {"version": "..."}` on
 stable release tags, using the `HELM_CHARTS_DISPATCH_TOKEN` secret (copy
 `metric-server`'s `.github/workflows/image.yml` "notify helm-charts of the
-new release" step).
+new release" step). If you're editing that workflow file, validate it with
+`actionlint path/to/workflow.yml` (and `python3 -c "import yaml;
+yaml.safe_load(open('...'))"` for a quick syntax check) before considering
+it done - and simulate `bump-chart.yaml`'s own bash logic locally (derive
+`<name>` by stripping the `-released` suffix from the `event_type`, confirm
+`charts/<name>/Chart.yaml` exists) to catch naming mismatches early.
 
 ### CI/CD: release pipeline
 
