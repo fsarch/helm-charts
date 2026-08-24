@@ -57,18 +57,18 @@ serviceAccount:
 
 service:
   type: ClusterIP
-  port: 3000
+  port: 8080
   # -- Additional annotations for the Service.
   annotations: {}
 
 # -- Container port the application listens on.
-containerPort: 3000
+containerPort: 8080
 
 # -- application env vars managed via well-known values below.
 # Set to "" to omit an env var entirely.
 env:
   # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
-  port: "3000"
+  port: "8080"
   # -- Path inside the container the rendered config.yml is mounted at.
   configFilePath: /etc/pdf-render-server/config.yml
 
