@@ -19,6 +19,7 @@ Helm charts for fsarch services.
 | [`frontier-worker`](charts/frontier-worker) | HTTP proxy worker driven by frontier-server's control plane ([source](https://github.com/fsarch/frontier-server)) |
 | [`material-tracing-server`](charts/material-tracing-server) | Material/parts traceability service ([source](https://github.com/fsarch/material-tracing-server)) |
 | [`product-server`](charts/product-server) | Product catalog service ([source](https://github.com/fsarch/product-server)) |
+| [`printer-server`](charts/printer-server) | Printer management/print-job service ([source](https://github.com/fsarch/printer-server)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see

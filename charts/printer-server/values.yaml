@@ -1,0 +1,208 @@
+# -- Default values for the printer-server chart.
+# Declare variables to be passed into your templates.
+
+# -- Overrides the name used to build resource names (defaults to the chart name).
+nameOverride: ""
+# -- Overrides the full resource name (defaults to "<release name>-<chart name>").
+fullnameOverride: ""
+
+namespace:
+  # -- Whether the chart should create the target Namespace itself.
+  # Set to false if the namespace already exists / is managed elsewhere.
+  create: false
+  # -- Namespace to deploy the resources into. Defaults to the release namespace
+  # (`.Release.Namespace`, i.e. whatever `--namespace` / `-n` was set to) when empty.
+  name: ""
+
+# -- Extra labels applied to every resource created by this chart.
+commonLabels: {}
+
+# -- Extra annotations applied to every resource created by this chart.
+commonAnnotations: {}
+
+replicaCount: 1
+
+# -- Number of old ReplicaSets to retain for the Deployment.
+revisionHistoryLimit: 3
+
+image:
+  repository: docker.io/fsarch/printer-server
+  pullPolicy: Always
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# -- Secrets used to pull the image from a private registry.
+imagePullSecrets: []
+
+# -- Extra labels for the Pod template.
+podLabels: {}
+
+# -- Extra annotations for the Pod template.
+podAnnotations: {}
+
+podSecurityContext: {}
+# runAsNonRoot: true
+# runAsUser: 1000
+
+securityContext: {}
+# readOnlyRootFilesystem: true
+# allowPrivilegeEscalation: false
+
+serviceAccount:
+  # -- Whether a ServiceAccount should be created.
+  create: false
+  # -- Name of the ServiceAccount to use. If not set and `create` is true, a name is generated.
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  # -- Additional annotations for the Service.
+  annotations: {}
+
+# -- Container port the application listens on.
+containerPort: 8080
+
+# -- application env vars managed via well-known values below.
+# Set to "" to omit an env var entirely.
+env:
+  # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
+  port: "8080"
+  # -- Path inside the container the rendered config.yml is mounted at.
+  configFilePath: /etc/printer-server/config.yml
+
+# -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
+extraEnv: []
+# - name: LOG_LEVEL
+#   value: debug
+
+configMap:
+  # -- Whether to create the ConfigMap holding config.yml. Disable to bring your own.
+  create: true
+  # -- Overrides the ConfigMap name (defaults to "<fullname>-config").
+  nameOverride: ""
+
+# -- config.yml contents, rendered from structured values below.
+# Set `config.raw` to a literal YAML/string block to bypass the structured
+# values entirely and use it verbatim as config.yml.
+#
+# Besides the usual auth/uac/database (same pattern as metric-server/
+# product-server), printer-server has a genuinely-consumed `event_bus`
+# section (verified: src/event-bus/event-bus.module.ts actually reads it,
+# unlike the dead config sections found in several sibling apps) - a
+# PostgreSQL LISTEN/NOTIFY event bus used internally.
+config:
+  raw: ""
+
+  # auth.type selects which auth scheme is rendered into config.yml's
+  # `auth:` section - mutually exclusive, only the field(s) for the active
+  # type are rendered:
+  #   - type: jwt-jwk -> renders auth.jwkUrl
+  #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
+  #   - type: static  -> renders auth.secret and auth.users (id/username/password)
+  auth:
+    type: jwt-jwk
+    # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
+    jwkUrl: "https://login.example.com/protocol/openid-connect/certs"
+    # -- OIDC discovery URL used to validate tokens when type is "oidc".
+    discoveryUrl: ""
+    # -- Shared secret used to sign/verify tokens when type is "static".
+    # Sensitive - prefer setting via --set or a non-committed values file.
+    secret: ""
+    # -- Local user list used when type is "static".
+    users: []
+    # - id: "11111111-1111-1111-1111-111111111111"
+    #   username: admin
+    #   password: "<set via --set or a secret values file>"
+
+  # -- Structured `uac:` section (static user/permission list). Valid
+  # permissions per the app's own Role enum: manage_claims, manage_printers.
+  uac:
+    type: static
+    users:
+      - user_id: "86f01463-2952-4a7c-8d81-094561d110f0"
+        permissions:
+          - manage_printers
+
+  # database.type selects which schema is rendered into config.yml's
+  # `database:` section; only the field(s) for the active type are
+  # rendered:
+  #   - type: sqlite               -> renders database.database (file path) only
+  #   - type: postgres|cockroachdb -> renders host/port/username/password/ssl
+  database:
+    type: postgres
+    database: printer-server
+    host: ""
+    port: 5432
+    username: ""
+    # -- Database password. Sensitive - prefer setting via --set or a
+    # non-committed values file rather than checking it in.
+    password: ""
+    ssl:
+      rejectUnauthorized: true
+
+  # -- `event_bus:` - internal PostgreSQL LISTEN/NOTIFY event bus.
+  # `connection.type` is mutually exclusive, only the field(s) for the
+  # active type are rendered:
+  #   - type: postgres-database -> reuses config.database above as-is
+  #     (requires config.database.type: postgres); no extra fields.
+  #   - type: postgres          -> a separate, explicit connection
+  #     (host/port/username/password/database/ssl below).
+  eventBus:
+    channelPrefix: printer_server
+    connection:
+      type: postgres-database
+      host: ""
+      port: 5432
+      database: ""
+      username: ""
+      # -- Sensitive - prefer setting via --set or a non-committed values file.
+      password: ""
+      ssl:
+        rejectUnauthorized: true
+
+livenessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+
+readinessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# -- Extra volumes appended to the Deployment's pod spec.
+extraVolumes: []
+
+# -- Extra volume mounts appended to the printer-server container.
+extraVolumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: printer-server.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
