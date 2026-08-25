@@ -1,5 +1,29 @@
 apiVersion: v1
 entries:
+  ai-server:
+  - apiVersion: v2
+    appVersion: 0.0.0
+    created: "2026-08-25T21:17:45.385791363Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch ai-server
+    digest: 6f2944ef18f053aa366314c2ce1e0cc632b04cd1a8b8692dbb8ee2bdeb70e59d
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - ai
+    - ai-server
+    maintainers:
+    - name: fsarch
+    name: ai-server
+    sources:
+    - https://github.com/fsarch/ai-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/ai-server-0.0.0/ai-server-0.0.0.tgz
+    version: 0.0.0
   dashboard:
   - apiVersion: v2
     appVersion: 0.0.3
@@ -782,4 +806,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-08-24T20:27:22.769746398Z"
+generated: "2026-08-25T21:17:45.385853466Z"
