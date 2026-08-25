@@ -29,7 +29,7 @@ image:
   repository: docker.io/fsarch/ai-server
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.2"
+  tag: "0.0.3"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
