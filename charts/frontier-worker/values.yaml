@@ -65,11 +65,16 @@ serviceAccount:
 
 service:
   type: ClusterIP
-  port: 8080
+  # -- Deliberately 80, not matching `containerPort` (8080, the Docker
+  # image's own port) - the Service's `targetPort` is the named container
+  # port `http` regardless of `service.port`, so this is a normal port
+  # remap, not a footgun (same as `ai-server`/`email-sync-server`).
+  port: 80
   # -- Additional annotations for the Service.
   annotations: {}
 
-# -- Container port the application listens on.
+# -- Container port the application listens on (matches the Docker image's
+# own `PORT`/`EXPOSE`, independent of `service.port` above).
 containerPort: 8080
 
 # -- application env vars managed via well-known values below.
