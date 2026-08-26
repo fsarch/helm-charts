@@ -61,7 +61,7 @@ serviceAccount:
   annotations: {}
 
 service:
-  type: ClusterIP^
+  type: ClusterIP
   # -- Deliberately 80, not matching `containerPort` (8080, the Docker
   # image's own port) - the Service's `targetPort` is the named container
   # port `http` regardless of `service.port`, so this is a normal port

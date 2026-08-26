@@ -21,6 +21,11 @@ each with its own image repository (`fsarch/frontier-server` /
 `fsarch/frontier-server`, not `fsarch/frontier-api`), one image per chart
 like everywhere else in this repo.
 
+**Note:** like `ai-server`/`email-sync-server`, both charts' Services
+default to port **80**, not matching `containerPort` (8080, the Docker
+image's own port) - `targetPort` is always the named container port
+regardless of `service.port`, so this is a normal remap, not a bug.
+
 `config.yml` has `auth`/`uac`/`database` (same pattern as `metric-server`/
 `frontend-server`/`function-gateway`) plus a `workers.websocket` section -
 the shared secret and poll interval `frontier-worker` instances use to
@@ -58,8 +63,8 @@ and only pass `--namespace`.
 | `podSecurityContext` / `securityContext` | Pod- / container-level `securityContext`. | `{}` |
 | `serviceAccount.create` | Create a dedicated ServiceAccount. | `false` |
 | `serviceAccount.name` | ServiceAccount name (generated when empty and `create: true`). | `""` |
-| `service.type` / `service.port` / `service.annotations` | Service exposing the app. | `ClusterIP`, `8080`, `{}` |
-| `containerPort` | Port the container listens on. | `8080` |
+| `service.type` / `service.port` / `service.annotations` | Service exposing the app - `service.port` is **80** here, see note above. | `ClusterIP`, `80`, `{}` |
+| `containerPort` | Port the container listens on (the Docker image's own port). | `8080` |
 | `env.port` | `PORT` env var (should match `containerPort`). | `"8080"` |
 | `env.configFilePath` | Mount path for the rendered `config.yml` (`CONFIG_FILE_PATH`). | `/etc/frontier-server/config.yml` |
 | `extraEnv` | Additional raw `EnvVar` entries appended to the container. | `[]` |

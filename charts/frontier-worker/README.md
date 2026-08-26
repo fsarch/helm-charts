@@ -19,6 +19,11 @@ this app, and even that is optional (see below).
 with its own image repository (`fsarch/frontier-worker` /
 `fsarch/frontier-server`).
 
+**Note:** like `ai-server`/`email-sync-server`, both charts' Services
+default to port **80**, not matching `containerPort` (8080, the Docker
+image's own port) - `targetPort` is always the named container port
+regardless of `service.port`, so this is a normal remap, not a bug.
+
 **Architecturally very different from every other chart here:**
 - No `@fsarch/server`, no database, not even NestJS - it's a small
   standalone Node process. Almost everything is env vars (`extraEnv`,
@@ -66,8 +71,8 @@ chart's placeholder defaults won't connect to anything real.
 | `podSecurityContext` / `securityContext` | Pod- / container-level `securityContext`. | `{}` |
 | `serviceAccount.create` | Create a dedicated ServiceAccount. | `false` |
 | `serviceAccount.name` | ServiceAccount name (generated when empty and `create: true`). | `""` |
-| `service.type` / `service.port` / `service.annotations` | Service exposing the app. | `ClusterIP`, `8080`, `{}` |
-| `containerPort` | Port the container listens on. | `8080` |
+| `service.type` / `service.port` / `service.annotations` | Service exposing the app - `service.port` is **80** here, see note above. | `ClusterIP`, `80`, `{}` |
+| `containerPort` | Port the container listens on (the Docker image's own port). | `8080` |
 | `env.port` | `PORT` env var. Left empty - the app doesn't read `PORT`, see `extraEnv`. | `""` |
 | `env.configFilePath` | Mount path for the rendered `config.yml`, used only when `configMap.create: true`. | `/etc/frontier-worker/config.yml` |
 | `extraEnv` | `FRONTIER_WORKER_PORT` / `FRONTIER_CONTROL_PLANE_URL` / `FRONTIER_WORKER_AUTH_TOKEN` pre-populated with placeholders - **must** be overridden for a working deployment. `FRONTIER_WORKER_AUTH_TOKEN` is sensitive - set via `--set` or a non-committed values file. | see `values.yaml` |
