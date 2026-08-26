@@ -21,6 +21,7 @@ Helm charts for fsarch services.
 | [`product-server`](charts/product-server) | Product catalog service ([source](https://github.com/fsarch/product-server)) |
 | [`printer-server`](charts/printer-server) | Printer management/print-job service ([source](https://github.com/fsarch/printer-server)) |
 | [`ai-server`](charts/ai-server) | LLM/MCP gateway service ([source](https://github.com/fsarch/ai-server)) |
+| [`email-sync-server`](charts/email-sync-server) | IMAP/SMTP email sync service ([source](https://github.com/fsarch/email-sync-server)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see
