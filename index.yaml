@@ -163,6 +163,30 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/dashboard-0.0.0/dashboard-0.0.0.tgz
     version: 0.0.0
+  email-sync-server:
+  - apiVersion: v2
+    appVersion: 0.0.0
+    created: "2026-08-26T05:55:25.080367314Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch email-sync-server
+    digest: 66aa628591f924109850d1c7e23a7572046441a53f2f14292ccec86ba451cf19
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - email
+    - email-sync-server
+    maintainers:
+    - name: fsarch
+    name: email-sync-server
+    sources:
+    - https://github.com/fsarch/email-sync-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/email-sync-server-0.0.0/email-sync-server-0.0.0.tgz
+    version: 0.0.0
   frontend-server:
   - apiVersion: v2
     appVersion: 0.0.1
@@ -875,4 +899,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-08-25T23:46:20.078180491Z"
+generated: "2026-08-26T05:55:25.080426343Z"
