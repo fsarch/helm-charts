@@ -70,7 +70,7 @@ permissions granted) rather than guessing at your environment.
 | `config.defaults` | Default `id` per service `type`. | `{}` |
 | `config.theme` | `{primary_color, background_color}` (hex); falls back to the app's built-in defaults when empty. | `{}` |
 | `config.uac` | Token-based (Keycloak realm role → permission) access control. Empty `mappings` grants nobody anything. | `{type: token-based, mappings: []}` |
-| `config.tracing` | OpenTelemetry tracing (mirrors `@fsarch/server`'s built-in tracing). `null` omits the `tracing:` section entirely (off, matching the app default); set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`). | `null` |
+| `config.tracing` | OpenTelemetry tracing (mirrors `@fsarch/server`'s built-in tracing). `null` omits the `tracing:` section entirely (off, matching the app default); set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` (recommended for cross-service trace correlation) if omitted. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |
@@ -128,6 +128,7 @@ config:
   tracing:
     enabled: true
     serviceName: dashboard
+    sampler: parentbased_traceidratio # default, see values.yaml
     sampleRatio: 1.0
     exporter:
       type: otlp-http

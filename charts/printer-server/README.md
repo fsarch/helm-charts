@@ -66,6 +66,7 @@ and only pass `--namespace`.
 | `config.eventBus.channelPrefix` | Prefix applied to all `LISTEN`/`NOTIFY` channel names. | `printer_server` |
 | `config.eventBus.connection.type` | `postgres-database` (reuse `config.database`) or `postgres` (separate explicit connection). Only the field(s) for the active type are rendered. | `postgres-database` |
 | `config.eventBus.connection.host` / `.port` / `.database` / `.username` / `.password` / `.ssl` | Explicit connection settings, used only when `config.eventBus.connection.type` is `postgres`. `password` is sensitive - set via `--set` or a non-committed values file. | see `values.yaml` |
+| `config.tracing` | OpenTelemetry tracing (`@fsarch/server` built-in as of `^0.1.6`). `null` omits the `tracing:` section entirely; set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` if omitted. **Not yet effective here** - this app repo's pinned `@fsarch/server` version predates tracing, see values.yaml's comment. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |

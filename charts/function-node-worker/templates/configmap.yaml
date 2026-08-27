@@ -39,5 +39,30 @@ data:
         token_endpoint: {{ .Values.config.functionServer.auth.tokenEndpoint | quote }}
         client_id: {{ .Values.config.functionServer.auth.clientId | quote }}
         client_secret: {{ .Values.config.functionServer.auth.clientSecret | quote }}
+
+    {{- with .Values.config.tracing }}
+    tracing:
+      enabled: {{ .enabled }}
+      {{- if .serviceName }}
+      serviceName: {{ .serviceName | quote }}
+      {{- end }}
+      {{- if .sampler }}
+      sampler: {{ .sampler | quote }}
+      {{- end }}
+      {{- if .sampleRatio }}
+      sampleRatio: {{ .sampleRatio }}
+      {{- end }}
+      {{- with .exporter }}
+      exporter:
+        type: {{ .type | quote }}
+        {{- if ne .type "console" }}
+        url: {{ .url | quote }}
+        {{- with .headers }}
+        headers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     {{- end }}
 {{- end }}

@@ -81,7 +81,7 @@ and only pass `--namespace`.
 | `config.database.ssl` | TLS settings for `postgres`/`cockroachdb` (`rejectUnauthorized`, `ca`, `cert`, `key`; the latter three also accept `{path: ...}` pointing at a mounted file). | `{rejectUnauthorized: true}` |
 | `config.workers.websocket.authToken` | Shared secret `frontier-worker` instances present to authenticate their control-plane websocket connection - **must match** the sibling `frontier-worker` chart's `FRONTIER_WORKER_AUTH_TOKEN`. Sensitive - set via `--set` or a non-committed values file. | `""` |
 | `config.workers.websocket.configCheckIntervalMs` | How often (ms) connected workers poll for config changes. | `2000` |
-| `config.tracing` | OpenTelemetry tracing (`@fsarch/server` built-in). `null` omits the `tracing:` section entirely (off, matching the library default); set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`). | `null` |
+| `config.tracing` | OpenTelemetry tracing (`@fsarch/server` built-in as of `^0.1.6`). `null` omits the `tracing:` section entirely (off, matching the library default); set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` (recommended for cross-service trace correlation) if omitted. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |
@@ -107,6 +107,7 @@ config:
   tracing:
     enabled: true
     serviceName: frontier-server
+    sampler: parentbased_traceidratio # default, see values.yaml
     sampleRatio: 1.0
     exporter:
       type: otlp-http

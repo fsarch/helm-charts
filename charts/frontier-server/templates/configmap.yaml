@@ -59,6 +59,9 @@ data:
       {{- if .serviceName }}
       serviceName: {{ .serviceName | quote }}
       {{- end }}
+      {{- if .sampler }}
+      sampler: {{ .sampler | quote }}
+      {{- end }}
       {{- if .sampleRatio }}
       sampleRatio: {{ .sampleRatio }}
       {{- end }}

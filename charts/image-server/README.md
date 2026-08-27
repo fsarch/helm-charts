@@ -67,6 +67,7 @@ and only pass `--namespace`.
 | `config.database.host` / `.port` / `.database` / `.username` / `.password` (cockroachdb) | Connection settings for `cockroachdb`. `password` is sensitive - set it via `--set` or a non-committed values file. | see `values.yaml` |
 | `config.database.ssl` | TLS settings for `cockroachdb` (`rejectUnauthorized`, `ca`, `cert`, `key`; the latter three also accept `{path: ...}` pointing at a mounted file). | `{rejectUnauthorized: true}` |
 | `config.extra` | Freeform passthrough for `images`, `naming`, `storage`, `caching`, `signed_urls` - merged into `config.yml` verbatim via `toYaml`. | see `values.yaml` |
+| `config.tracing` | OpenTelemetry tracing, matching `@fsarch/server`'s config shape. `null` omits the `tracing:` section entirely; set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` if omitted. **Has no effect at all** - image-server doesn't depend on `@fsarch/server` (its own local framework) and tracing hasn't been ported into it yet, see values.yaml's comment. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |

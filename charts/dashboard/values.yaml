@@ -155,11 +155,16 @@ config:
   # from config.yml entirely, matching the app's own "off by default"
   # behavior; set it to enable. `exporter.type` is mutually exclusive:
   # `console` needs no extra fields, `otlp-http`/`otlp-grpc` need `url`
-  # (+ optional `headers`).
+  # (+ optional `headers`). `sampler` defaults to `parentbased_traceidratio`
+  # if omitted (recommended - keeps sampling decisions consistent with an
+  # incoming trace's parent across fsarch services rather than each service
+  # re-sampling independently); other options: always_on, always_off,
+  # traceidratio, parentbased_always_on, parentbased_always_off.
   tracing: null
   # tracing:
   #   enabled: true
   #   serviceName: dashboard
+  #   sampler: parentbased_traceidratio
   #   sampleRatio: 1.0
   #   exporter:
   #     type: console

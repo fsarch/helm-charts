@@ -140,6 +140,29 @@ config:
     ssl:
       rejectUnauthorized: true
 
+  # -- OpenTelemetry tracing, matching `@fsarch/server`'s built-in tracing
+  # config shape (see e.g. the `frontier-server`/`dashboard` charts here).
+  # `null` (the default) omits the `tracing:` section from config.yml
+  # entirely. NOTE: unlike the `@fsarch/server`-based charts, image-server
+  # doesn't depend on that package at all (its own local auth/uac/database
+  # framework) - this option has **no effect at all** until tracing is
+  # ported into image-server's own code. Left in place so it's ready to use
+  # once that happens. `exporter.type` is mutually exclusive: `console`
+  # needs no extra fields, `otlp-http`/`otlp-grpc` need `url` (+ optional
+  # `headers`). `sampler` defaults to `parentbased_traceidratio` if omitted.
+  tracing: null
+  # tracing:
+  #   enabled: true
+  #   serviceName: image-server
+  #   sampler: parentbased_traceidratio
+  #   sampleRatio: 1.0
+  #   exporter:
+  #     type: console
+  #     # type: otlp-http
+  #     # url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+  #     # headers:
+  #     #   Authorization: "Bearer <token>"
+
   # -- Freeform passthrough for the rest of config.yml - merged in verbatim
   # via `toYaml`. Defaults below mirror image-server's own example config.
   extra:

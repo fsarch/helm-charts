@@ -59,6 +59,7 @@ and only pass `--namespace`.
 | `config.partition.partitionSizeDays` | Size of each measurements partition, in days. | `30` |
 | `config.partition.warmTierRetentionDays` | How long a partition stays in the warm tier before moving to cold, in days. | `365` |
 | `config.deletion` | Hard-deletion schedule for soft-deleted records (`hardDeleteAfterDays`, `purgeSchedule.cron`, `purgeSchedule.timezone`). Set to `null` to omit the `deletion:` section entirely. | see `values.yaml` |
+| `config.tracing` | OpenTelemetry tracing (`@fsarch/server` built-in as of `^0.1.6`). `null` omits the `tracing:` section entirely; set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` if omitted. **Not yet effective here** - this app repo's pinned `@fsarch/server` version predates tracing, see values.yaml's comment. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |

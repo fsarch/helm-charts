@@ -162,6 +162,30 @@ config:
       ssl:
         rejectUnauthorized: true
 
+  # -- OpenTelemetry tracing (@fsarch/server built-in as of ^0.1.6). `null`
+  # (the default) omits the `tracing:` section from config.yml entirely.
+  # NOTE: this chart's app repo currently pins an older @fsarch/server
+  # version that predates tracing - this option is a no-op until that
+  # dependency is updated there. Left in place so it's ready to use once it
+  # is. `exporter.type` is mutually exclusive: `console` needs no extra
+  # fields, `otlp-http`/`otlp-grpc` need `url` (+ optional `headers`).
+  # `sampler` defaults to `parentbased_traceidratio` if omitted
+  # (recommended - keeps sampling decisions consistent with an incoming
+  # trace's parent across fsarch services); other options: always_on,
+  # always_off, traceidratio, parentbased_always_on, parentbased_always_off.
+  tracing: null
+  # tracing:
+  #   enabled: true
+  #   serviceName: printer-server
+  #   sampler: parentbased_traceidratio
+  #   sampleRatio: 1.0
+  #   exporter:
+  #     type: console
+  #     # type: otlp-http
+  #     # url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+  #     # headers:
+  #     #   Authorization: "Bearer <token>"
+
 livenessProbe:
   enabled: true
   tcpSocket:

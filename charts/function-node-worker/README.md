@@ -68,6 +68,7 @@ and only pass `--namespace`.
 | `config.workerAuth.tokenEndpoint` / `.clientId` / `.clientSecret` | OAuth2 client-credentials this worker uses to call `function-server`. `clientSecret` is sensitive - set via `--set` or a non-committed values file. | see `values.yaml` |
 | `config.functionServer.url` | Base URL of the `function-server` instance to poll. | `http://function-server.example.com` |
 | `config.functionServer.auth.tokenEndpoint` / `.clientId` / `.clientSecret` | OAuth2 client-credentials nested under `function_server.auth`. `clientSecret` is sensitive - set via `--set` or a non-committed values file. | see `values.yaml` |
+| `config.tracing` | OpenTelemetry tracing, matching `@fsarch/server`'s config shape. `null` omits the `tracing:` section entirely; set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` if omitted. **Has no effect at all** - function-node-worker doesn't depend on `@fsarch/server` (its own local framework) and tracing hasn't been ported into it yet, see values.yaml's comment. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |

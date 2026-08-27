@@ -53,5 +53,30 @@ data:
 
     providers:
       {{- toYaml .Values.config.providers | nindent 6 }}
+
+    {{- with .Values.config.tracing }}
+    tracing:
+      enabled: {{ .enabled }}
+      {{- if .serviceName }}
+      serviceName: {{ .serviceName | quote }}
+      {{- end }}
+      {{- if .sampler }}
+      sampler: {{ .sampler | quote }}
+      {{- end }}
+      {{- if .sampleRatio }}
+      sampleRatio: {{ .sampleRatio }}
+      {{- end }}
+      {{- with .exporter }}
+      exporter:
+        type: {{ .type | quote }}
+        {{- if ne .type "console" }}
+        url: {{ .url | quote }}
+        {{- with .headers }}
+        headers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     {{- end }}
 {{- end }}
