@@ -52,5 +52,27 @@ data:
       websocket:
         auth_token: {{ .Values.config.workers.websocket.authToken | quote }}
         config_check_interval_ms: {{ .Values.config.workers.websocket.configCheckIntervalMs }}
+
+    {{- with .Values.config.tracing }}
+    tracing:
+      enabled: {{ .enabled }}
+      {{- if .serviceName }}
+      serviceName: {{ .serviceName | quote }}
+      {{- end }}
+      {{- if .sampleRatio }}
+      sampleRatio: {{ .sampleRatio }}
+      {{- end }}
+      {{- with .exporter }}
+      exporter:
+        type: {{ .type | quote }}
+        {{- if ne .type "console" }}
+        url: {{ .url | quote }}
+        {{- with .headers }}
+        headers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
     {{- end }}
 {{- end }}

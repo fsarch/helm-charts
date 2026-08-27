@@ -15,11 +15,16 @@ rendering) is specific to this app.
 section in `config.yml` at all. Auth is [NextAuth](https://next-auth.js.org/)
 with a Keycloak provider, configured entirely via env vars
 (`values.yaml`'s `extraEnv`, pre-populated below since `fsarch-common` has
-no dedicated slot for them). `config.yml` itself only holds
+no dedicated slot for them). `config.yml` itself mostly holds
 `services`/`defaults`/`theme`/`uac` - all freeform (no `type`-selected
 mutually-exclusive schema like `auth`/`database` on the other charts), so
-every `config.*` key here is rendered via `toYaml` as-is. There's also no
+those `config.*` keys are rendered via `toYaml` as-is. There's also no
 database - the app is stateless.
+
+**Note:** like `ai-server`/`email-sync-server`, the Service defaults to
+port **80**, not matching `containerPort` (3000, the Docker image's own
+port) - `targetPort` is always the named container port regardless of
+`service.port`, so this is a normal remap, not a bug.
 
 ## Installing
 
@@ -54,9 +59,9 @@ permissions granted) rather than guessing at your environment.
 | `podSecurityContext` / `securityContext` | Pod- / container-level `securityContext`. | `{}` |
 | `serviceAccount.create` | Create a dedicated ServiceAccount. | `false` |
 | `serviceAccount.name` | ServiceAccount name (generated when empty and `create: true`). | `""` |
-| `service.type` / `service.port` / `service.annotations` | Service exposing the app. | `ClusterIP`, `3000`, `{}` |
-| `containerPort` | Port the container listens on. | `3000` |
-| `env.port` | `PORT` env var (should match `containerPort`). | `"3000"` |
+| `service.type` / `service.port` / `service.annotations` | Service exposing the app - `service.port` is **80** here, see note above. | `ClusterIP`, `80`, `{}` |
+| `containerPort` | Port the container listens on (the Docker image's own port). | `3000` |
+| `env.port` | `PORT` env var (should match `containerPort`, not `service.port`). | `"3000"` |
 | `env.configFilePath` | Mount path for the rendered `config.yml` (`CONFIG_FILE_PATH`). | `/etc/dashboard/config.yml` |
 | `extraEnv` | NextAuth/Keycloak/HMAC env vars (see above) - pre-populated with placeholders, **must** be overridden for a working deployment. `NEXTAUTH_SECRET`/`AUTH_CLIENT_SECRET`/`CRYPTO_SECRET` are sensitive - set via `--set` or a non-committed values file. | see `values.yaml` |
 | `configMap.create` | Whether to render the ConfigMap holding `config.yml`. Disable to bring your own and set `env.configFilePath` accordingly. | `true` |
@@ -65,6 +70,7 @@ permissions granted) rather than guessing at your environment.
 | `config.defaults` | Default `id` per service `type`. | `{}` |
 | `config.theme` | `{primary_color, background_color}` (hex); falls back to the app's built-in defaults when empty. | `{}` |
 | `config.uac` | Token-based (Keycloak realm role → permission) access control. Empty `mappings` grants nobody anything. | `{type: token-based, mappings: []}` |
+| `config.tracing` | OpenTelemetry tracing (mirrors `@fsarch/server`'s built-in tracing). `null` omits the `tracing:` section entirely (off, matching the app default); set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`). | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
 | `livenessProbe` / `readinessProbe` | Probe definitions (`enabled` toggles them, remaining keys are passed through verbatim). | TCP on `http`, see `values.yaml` |
 | `resources` | Container resource requests/limits. | `50m/128Mi` requests, `500m/512Mi` limits |
@@ -114,6 +120,27 @@ config:
                   type: metric
                   id: "*"
 ```
+
+### Example: enabling tracing
+
+```yaml
+config:
+  tracing:
+    enabled: true
+    serviceName: dashboard
+    sampleRatio: 1.0
+    exporter:
+      type: otlp-http
+      url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+      headers:
+        Authorization: "Bearer <token>"
+```
+
+Traces the Next.js server's incoming requests and outgoing `fetch()` calls
+(e.g. every backend call `fetchService` makes) - see the app repo's
+`docs/tracing.md`. Uses the exact same `tracing:` schema as
+`@fsarch/server`-based charts (`frontier-server` etc.), so a shared
+collector correlates traces across the dashboard and the backends it calls.
 
 ### Example: real auth wiring
 

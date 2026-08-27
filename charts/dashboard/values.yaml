@@ -57,11 +57,16 @@ serviceAccount:
 
 service:
   type: ClusterIP
-  port: 3000
+  # -- Deliberately 80, not matching `containerPort` (3000, the Docker
+  # image's own port) - the Service's `targetPort` is the named container
+  # port `http` regardless of `service.port`, so this is a normal port
+  # remap, not a footgun (same as `ai-server`/`email-sync-server`).
+  port: 80
   # -- Additional annotations for the Service.
   annotations: {}
 
-# -- Container port the application listens on.
+# -- Container port the application listens on (matches the Docker image's
+# own port, independent of `service.port` above).
 containerPort: 3000
 
 # -- application env vars managed via well-known values below.
@@ -112,13 +117,15 @@ configMap:
 # Set `config.raw` to a literal YAML/string block to bypass the structured
 # values entirely and use it verbatim as config.yml.
 #
-# None of dashboard's config.yml sections have a mutually-exclusive
-# upstream schema per `type` the way auth/database do on the other charts -
-# it's all freeform (which backend services exist, role->permission
-# mappings, theming), so every key here is rendered via `toYaml` as-is.
-# Defaults are intentionally empty/inert (no services, no granted
-# permissions) - this is meant to be filled in per deployment, see the
-# README for a full worked example.
+# `services`/`defaults`/`theme`/`uac` have no mutually-exclusive upstream
+# schema per `type` the way auth/database do on the other charts - it's all
+# freeform (which backend services exist, role->permission mappings,
+# theming), so those keys are rendered via `toYaml` as-is. Defaults are
+# intentionally empty/inert (no services, no granted permissions) - this is
+# meant to be filled in per deployment, see the README for a full worked
+# example. `tracing` is the one exception with a real `type`-selected
+# schema (mirrors `@fsarch/server`'s built-in tracing, see
+# docs/tracing.md in the app repo).
 config:
   raw: ""
 
@@ -141,6 +148,25 @@ config:
   uac:
     type: token-based
     mappings: []
+
+  # -- OpenTelemetry tracing (mirrors `@fsarch/server`'s built-in tracing -
+  # no app code changes needed once enabled, see the app repo's
+  # docs/tracing.md). `null` (the default) omits the `tracing:` section
+  # from config.yml entirely, matching the app's own "off by default"
+  # behavior; set it to enable. `exporter.type` is mutually exclusive:
+  # `console` needs no extra fields, `otlp-http`/`otlp-grpc` need `url`
+  # (+ optional `headers`).
+  tracing: null
+  # tracing:
+  #   enabled: true
+  #   serviceName: dashboard
+  #   sampleRatio: 1.0
+  #   exporter:
+  #     type: console
+  #     # type: otlp-http
+  #     # url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+  #     # headers:
+  #     #   Authorization: "Bearer <token>"
 
 livenessProbe:
   enabled: true
