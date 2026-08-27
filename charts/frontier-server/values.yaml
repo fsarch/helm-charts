@@ -163,6 +163,24 @@ config:
       authToken: ""
       configCheckIntervalMs: 2000
 
+  # -- OpenTelemetry tracing (@fsarch/server built-in as of ^0.1.5 - no app
+  # code changes needed once enabled, see the app repo's own README). `null`
+  # (the default) omits the `tracing:` section from config.yml entirely,
+  # matching the library's own "off by default" behavior; set it to enable.
+  # `exporter.type` is mutually exclusive: `console` needs no extra fields,
+  # `otlp-http`/`otlp-grpc` need `url` (+ optional `headers`).
+  tracing: null
+  # tracing:
+  #   enabled: true
+  #   serviceName: frontier-server
+  #   sampleRatio: 1.0
+  #   exporter:
+  #     type: console
+  #     # type: otlp-http
+  #     # url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+  #     # headers:
+  #     #   Authorization: "Bearer <token>"
+
 livenessProbe:
   enabled: true
   tcpSocket:

@@ -117,6 +117,23 @@ extraEnv:
   #   value: /etc/frontier-worker/config.yml   # set this when configMap.create: true
   # - name: FRONTIER_WORKER_DEBUG
   #   value: "true"
+  #
+  # OpenTelemetry tracing - env-var configured (unlike the sibling
+  # frontier-server chart's config.yml-based `config.tracing`), off by
+  # default. Exports the same way frontier-api does and participates in the
+  # same traces (W3C traceparent propagation) when both have it enabled.
+  # - name: FRONTIER_WORKER_TRACING_ENABLED
+  #   value: "true"
+  # - name: FRONTIER_WORKER_TRACING_SERVICE_NAME
+  #   value: frontier-worker
+  # - name: FRONTIER_WORKER_TRACING_SAMPLE_RATIO
+  #   value: "1"
+  # - name: FRONTIER_WORKER_TRACING_EXPORTER
+  #   value: console   # or otlp-http / otlp-grpc
+  # - name: FRONTIER_WORKER_TRACING_EXPORTER_URL
+  #   value: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces   # required for otlp-http/otlp-grpc
+  # - name: FRONTIER_WORKER_TRACING_EXPORTER_HEADERS
+  #   value: '{"authorization":"Bearer <token>"}'
 
 configMap:
   # -- Whether to create the ConfigMap holding config.yml. Off by default -
