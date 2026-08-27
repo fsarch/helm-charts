@@ -37,7 +37,7 @@ image:
   repository: docker.io/fsarch/frontier-worker
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.8"
+  tag: "0.0.9"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
