@@ -643,6 +643,29 @@ entries:
     version: 0.0.0
   frontier-worker:
   - apiVersion: v2
+    appVersion: 0.0.16
+    created: "2026-08-28T22:39:36.128949455Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch frontier-worker
+    digest: 8cfc9134e5a6fb313013259ad30f7825719c1512b5a998a5f358b5a0d0b8e8a8
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - frontier
+    - frontier-worker
+    maintainers:
+    - name: fsarch
+    name: frontier-worker
+    sources:
+    - https://github.com/fsarch/frontier-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/frontier-worker-0.0.16/frontier-worker-0.0.16.tgz
+    version: 0.0.16
+  - apiVersion: v2
     appVersion: 0.0.11
     created: "2026-08-28T17:41:20.413298805Z"
     dependencies:
@@ -1483,4 +1506,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-08-28T22:28:22.163627627Z"
+generated: "2026-08-28T22:39:36.469553852Z"
