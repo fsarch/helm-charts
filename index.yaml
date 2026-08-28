@@ -1135,6 +1135,29 @@ entries:
     - https://github.com/fsarch/helm-charts/releases/download/metric-server-0.1.0/metric-server-0.1.0.tgz
     version: 0.1.0
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-08-28T21:52:48.20033225Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch metric-server
+    digest: b497476f2b5dfc5c0f982db6deb26cf4646364c88bdf4626d86ce2410790b17b
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - metrics
+    - metric-server
+    maintainers:
+    - name: fsarch
+    name: metric-server
+    sources:
+    - https://github.com/fsarch/metric-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/metric-server-0.0.4/metric-server-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     appVersion: 0.0.3
     created: "2026-08-17T10:51:03.923429593Z"
     dependencies:
@@ -1367,4 +1390,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-08-28T20:45:53.197097787Z"
+generated: "2026-08-28T21:52:48.200421572Z"
