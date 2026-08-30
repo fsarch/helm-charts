@@ -2,8 +2,8 @@ apiVersion: v2
 name: frontier-worker
 description: A Helm chart for deploying the fsarch frontier-worker
 type: application
-version: 0.0.19
-appVersion: "0.0.19"
+version: 0.0.20
+appVersion: "0.0.20"
 home: https://github.com/fsarch
 sources:
   - https://github.com/fsarch/frontier-server
