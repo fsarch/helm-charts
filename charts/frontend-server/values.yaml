@@ -29,7 +29,7 @@ image:
   repository: docker.io/fsarch/frontend-server
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.7"
+  tag: "0.0.8"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
