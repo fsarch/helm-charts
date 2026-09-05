@@ -1398,6 +1398,29 @@ entries:
     version: 0.0.0
   function-server:
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-09-05T15:48:50.876833314Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch function-server
+    digest: 0d4803e01fa642c330a5a1b87d73d00a6629585f7c40037185373e36c318540e
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - functions
+    - function-server
+    maintainers:
+    - name: fsarch
+    name: function-server
+    sources:
+    - https://github.com/fsarch/function-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/function-server-0.0.4/function-server-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     appVersion: 0.0.3
     created: "2026-09-05T15:15:01.525932161Z"
     dependencies:
@@ -1955,4 +1978,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-05T15:32:01.659518769Z"
+generated: "2026-09-05T15:48:50.876995412Z"
