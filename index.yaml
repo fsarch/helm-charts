@@ -305,6 +305,30 @@ entries:
     version: 0.0.0
   frontend-server:
   - apiVersion: v2
+    appVersion: 0.0.8
+    created: "2026-09-05T12:14:40.033629234Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch frontend-server
+    digest: a8e147587b61a7fce8db1c6a6a9fc4a4eec5dce5b83a4788b7447b173561412b
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - frontend
+    - static-files
+    - frontend-server
+    maintainers:
+    - name: fsarch
+    name: frontend-server
+    sources:
+    - https://github.com/fsarch/frontend-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/frontend-server-0.0.8/frontend-server-0.0.8.tgz
+    version: 0.0.8
+  - apiVersion: v2
     appVersion: 0.0.7
     created: "2026-09-05T11:00:47.030802371Z"
     dependencies:
@@ -1860,4 +1884,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-05T11:00:47.030927366Z"
+generated: "2026-09-05T12:14:40.033786906Z"
