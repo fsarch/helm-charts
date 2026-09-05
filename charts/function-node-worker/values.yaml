@@ -33,7 +33,7 @@ image:
   # doesn't push versioned tags yet, only :latest, so falling back to
   # appVersion would point at a tag that doesn't exist. Override once that
   # changes.
-  tag: "0.0.3"
+  tag: "0.0.4"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
