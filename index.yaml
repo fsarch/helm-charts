@@ -1301,6 +1301,30 @@ entries:
     version: 0.0.0
   function-node-worker:
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-09-05T15:32:01.659397511Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch function-node-worker
+    digest: 8a14e1214370fbfaefbdb324ef47b49e8024eedec147d57d9ea9a48b694291f9
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - functions
+    - worker
+    - function-node-worker
+    maintainers:
+    - name: fsarch
+    name: function-node-worker
+    sources:
+    - https://github.com/fsarch/function-node-worker
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/function-node-worker-0.0.4/function-node-worker-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     appVersion: 0.0.3
     created: "2026-09-05T15:30:19.893435281Z"
     dependencies:
@@ -1931,4 +1955,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-05T15:30:19.89356197Z"
+generated: "2026-09-05T15:32:01.659518769Z"
