@@ -1320,6 +1320,19 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/frontier-worker-0.0.0/frontier-worker-0.0.0.tgz
     version: 0.0.0
+  fsarch-common:
+  - apiVersion: v2
+    created: "2026-09-07T21:47:58.709435128Z"
+    description: Shared Helm library with the common Deployment/Service/ServiceAccount/Namespace/Ingress
+      schema used by (most) fsarch application charts
+    digest: 225fd27afc20ce727d21c4f7d7545e87d011855b31b5ea58f02d3945f8096b46
+    maintainers:
+    - name: fsarch
+    name: fsarch-common
+    type: library
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/fsarch-common-0.1.0/fsarch-common-0.1.0.tgz
+    version: 0.1.0
   function-gateway:
   - apiVersion: v2
     appVersion: 0.0.1
@@ -2117,4 +2130,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-07T20:20:01.047999593Z"
+generated: "2026-09-07T21:47:58.709667554Z"
