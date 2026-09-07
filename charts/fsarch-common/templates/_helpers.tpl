@@ -47,6 +47,13 @@ helm.sh/chart: {{ include "fsarch-common.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.config }}
+{{- with .tracing }}
+{{- with .serviceName }}
+service.name: {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- with .Values.commonLabels }}
 {{ toYaml . }}
 {{- end }}

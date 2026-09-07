@@ -70,5 +70,6 @@ these keys must exist in the consuming chart's own `values.yaml`:
 | `extraVolumes` / `extraVolumeMounts` | Additional volumes/mounts |
 | `nodeSelector` / `tolerations` / `affinity` | Scheduling |
 | `ingress.enabled` / `ingress.className` / `ingress.annotations` / `ingress.hosts` / `ingress.tls` | Ingress |
+| `config.tracing.serviceName` | Optional - if set, also added as a `service.name` label (the OpenTelemetry resource attribute) on the Service, Deployment and its Pods, via `fsarch-common.labels`. Omitted entirely when unset (e.g. tracing disabled). Not part of this library's own schema - it's read straight from the consuming chart's app-specific `config.tracing` value (see e.g. `charts/material-tracing-server/values.yaml`), so it only applies to charts that model that section. |
 
 See `charts/pdf-render-server/values.yaml` for concrete defaults.
