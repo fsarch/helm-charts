@@ -59,6 +59,14 @@ spec:
             - name: CONFIG_FILE_PATH
               value: {{ .Values.env.configFilePath | quote }}
             {{- end }}
+            {{- with .Values.config }}
+            {{- with .tracing }}
+            {{- with .serviceName }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
             {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
