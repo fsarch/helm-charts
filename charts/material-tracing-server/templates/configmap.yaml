@@ -53,6 +53,15 @@ data:
       admin_url: {{ .Values.config.images.adminUrl | quote }}
       user_url: {{ .Values.config.images.userUrl | quote }}
 
+    {{- with .Values.config.productServer }}
+    product_server:
+      type: {{ .type | quote }}
+      url: {{ .url | quote }}
+      catalog_id: {{ .catalogId | quote }}
+      auth:
+        type: {{ .auth.type | quote }}
+    {{- end }}
+
     custom_actions:
       {{- toYaml .Values.config.customActions | nindent 6 }}
 

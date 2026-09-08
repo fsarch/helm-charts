@@ -10,13 +10,14 @@ rendering) is specific to this app.
 
 `config.yml` has `auth`/`uac`/`database` (same pattern as `metric-server`/
 `frontend-server`/`function-gateway`, full `jwt-jwk`/`oidc`/`static` auth
-support) plus two sections unique to this app: `images` (the image-server
-instance used for admin/user-facing image links) and `custom_actions`
-(deployment-specific action buttons that dispatch to function-server
-functions). The app repo's example config.yml also has `pdf_render` and
-`product_server` sections, but nothing in the app's source actually reads
-them - dead leftover config, intentionally omitted here (use `config.raw`
-if you want to keep them anyway).
+support) plus sections unique to this app: `images` (the image-server
+instance used for admin/user-facing image links), `product_server`
+(optional integration linking part types to products in a product-server
+catalog) and `custom_actions` (deployment-specific action buttons that
+dispatch to function-server functions). The app repo's example config.yml
+also has a `pdf_render` section, but nothing in the app's source actually
+reads it - dead leftover config, intentionally omitted here (use
+`config.raw` if you want to keep it anyway).
 
 The app also serves an MCP endpoint (`/.ai/mcp`) on the same port/process
 as the regular HTTP API - no separate Service or port is needed for it.
@@ -66,6 +67,7 @@ and only pass `--namespace`.
 | `config.database.database` (sqlite) | SQLite database file path, used instead of the connection settings above when `config.database.type` is `sqlite`. | n/a |
 | `config.database.ssl` | TLS settings for `postgres`/`cockroachdb` (`rejectUnauthorized`, `ca`, `cert`, `key`; the latter three also accept `{path: ...}` pointing at a mounted file). | `{rejectUnauthorized: true}` |
 | `config.images.adminUrl` / `.userUrl` | Admin/user-facing base URLs of the image-server instance to link to. | `http://image-server.example.com` (both) |
+| `config.productServer` | Optional product-server integration (links part types to products in a catalog). `null` omits the `product_server:` section entirely - the app treats it as optional and fails open (empty item list) rather than refusing to start. Set to `{type: remote, url, catalogId, auth: {type: credential-propagation}}` to enable. | `null` |
 | `config.customActions` | Freeform list of deployment-specific action buttons dispatching to function-server functions. Rendered as-is via `toYaml`. | `[]` |
 | `config.tracing` | OpenTelemetry tracing (`@fsarch/server` built-in as of `^0.1.6`). `null` omits the `tracing:` section entirely; set it to enable - `exporter.type` is mutually exclusive (`console`, or `otlp-http`/`otlp-grpc` which also need `url`/`headers`); `sampler` defaults to `parentbased_traceidratio` if omitted. **Not yet effective here** - this app repo's pinned `@fsarch/server` version predates tracing, see values.yaml's comment. | `null` |
 | `config.raw` | Literal `config.yml` content; overrides all `config.*` structured values above when set. | `""` |
@@ -107,6 +109,18 @@ config:
       - id: "11111111-1111-1111-1111-111111111111"
         username: admin
         password: "<set via --set or a secret values file>"
+```
+
+### Example: enabling the product-server integration
+
+```yaml
+config:
+  productServer:
+    type: remote
+    url: http://product-server.fsarch.svc.cluster.local:8080
+    catalogId: "f833498e-1fb0-492e-9361-12dd9847d7e4"
+    auth:
+      type: credential-propagation
 ```
 
 ### Example: sqlite instead of postgres/cockroachdb

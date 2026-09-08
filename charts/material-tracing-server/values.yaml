@@ -89,12 +89,14 @@ configMap:
 # Set `config.raw` to a literal YAML/string block to bypass the structured
 # values entirely and use it verbatim as config.yml.
 #
-# Note: the app repo's example config.yml also has `pdf_render` and
-# `product_server` sections, but nothing in material-tracing-server's src
-# actually reads them - same kind of dead leftover config as
-# function-gateway's unused `function_server`. Intentionally omitted here;
-# use `config.raw` if you want to keep them for parity with the app repo's
-# own config.yml anyway.
+# Note: the app repo's example config.yml also has a `pdf_render` section,
+# but nothing in material-tracing-server's src actually reads it - same kind
+# of dead leftover config as function-gateway's unused `function_server`.
+# Intentionally omitted here; use `config.raw` if you want to keep it for
+# parity with the app repo's own config.yml anyway. (`product_server` used
+# to be dead leftover too, but as of the app repo's product-server
+# integration it's a real, optional feature - see `config.productServer`
+# below.)
 config:
   raw: ""
 
@@ -150,6 +152,22 @@ config:
     type: remote
     adminUrl: "http://image-server.example.com"
     userUrl: "http://image-server.example.com"
+
+  # -- `product_server:` - optional integration linking part types to
+  # products in a product-server catalog (part type's `productId` gets
+  # validated against it, and its items are listable via this app's own
+  # `GET /v1/product-server/items`). `null` (the default) omits the
+  # `product_server:` section entirely - the app treats it as optional and
+  # fails open (product-server endpoints just return an empty list instead
+  # of erroring) rather than refusing to start. `type` is always "remote",
+  # the only value the app accepts.
+  productServer: null
+  # productServer:
+  #   type: remote
+  #   url: "http://product-server.fsarch.svc.cluster.local:8080"
+  #   catalogId: "f833498e-1fb0-492e-9361-12dd9847d7e4"
+  #   auth:
+  #     type: credential-propagation
 
   # -- `custom_actions:` - deployment-specific action buttons exposed in
   # the UI, each dispatching to a function-server function via
