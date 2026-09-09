@@ -1,0 +1,1 @@
+{{ include "fsarch-common.ingress" . }}

@@ -1,0 +1,251 @@
+# -- Default values for the tile-render-server chart.
+# Declare variables to be passed into your templates.
+
+# -- Overrides the name used to build resource names (defaults to the chart name).
+nameOverride: ""
+# -- Overrides the full resource name (defaults to "<release name>-<chart name>").
+fullnameOverride: ""
+
+namespace:
+  # -- Whether the chart should create the target Namespace itself.
+  # Set to false if the namespace already exists / is managed elsewhere.
+  create: false
+  # -- Namespace to deploy the resources into. Defaults to the release namespace
+  # (`.Release.Namespace`, i.e. whatever `--namespace` / `-n` was set to) when empty.
+  name: ""
+
+# -- Extra labels applied to every resource created by this chart.
+commonLabels: {}
+
+# -- Extra annotations applied to every resource created by this chart.
+commonAnnotations: {}
+
+replicaCount: 1
+
+# -- Number of old ReplicaSets to retain for the Deployment.
+revisionHistoryLimit: 3
+
+image:
+  repository: docker.io/fsarch/tile-render-server
+  pullPolicy: Always
+  # -- The app repo's image-build workflow only pushes versioned tags (and
+  # `:stable`) on `v*` git tags, none of which have been pushed yet as of
+  # this chart's creation - only `:latest` exists so far. Switch this back
+  # to "" (falls back to the chart's `appVersion`) once a first stable
+  # release has actually been tagged/published.
+  tag: "latest"
+
+# -- Secrets used to pull the image from a private registry.
+imagePullSecrets: []
+
+# -- Extra labels for the Pod template.
+podLabels: {}
+
+# -- Extra annotations for the Pod template.
+podAnnotations: {}
+
+podSecurityContext: {}
+# runAsNonRoot: true
+# runAsUser: 1000
+
+securityContext: {}
+# readOnlyRootFilesystem: true
+# allowPrivilegeEscalation: false
+
+serviceAccount:
+  # -- Whether a ServiceAccount should be created.
+  create: false
+  # -- Name of the ServiceAccount to use. If not set and `create` is true, a name is generated.
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  # -- Additional annotations for the Service.
+  annotations: {}
+
+# -- Container port the application listens on.
+containerPort: 8080
+
+# -- application env vars managed via well-known values below.
+# Set to "" to omit an env var entirely.
+env:
+  # -- Port the application listens on (PORT env var). Should usually match `containerPort`.
+  port: "8080"
+  # -- Path inside the container the rendered config.yml is mounted at.
+  configFilePath: /etc/tile-render-server/config.yml
+
+# -- Additional freeform environment variables (list of standard Kubernetes EnvVar objects).
+extraEnv: []
+# - name: LOG_LEVEL
+#   value: debug
+
+configMap:
+  # -- Whether to create the ConfigMap holding config.yml. Disable to bring your own.
+  create: true
+  # -- Overrides the ConfigMap name (defaults to "<fullname>-config").
+  nameOverride: ""
+
+# -- config.yml contents, rendered from structured values below.
+# Set `config.raw` to a literal YAML/string block to bypass the structured
+# values entirely and use it verbatim as config.yml.
+#
+# Note: `uac` is deliberately not modeled here (unlike most other
+# @fsarch/server-based charts in this repo) - the app's own main.ts only
+# calls `.enableAuth()`, never anything UAC-related, and neither
+# config.yaml nor config.example.yaml in the app repo has a `uac:` section.
+# Use `config.raw` if you need to add one anyway.
+config:
+  raw: ""
+
+  # auth.type selects which auth scheme is rendered into config.yml's
+  # `auth:` section - mutually exclusive, only the field(s) for the active
+  # type are rendered (all three are accepted; the app repo's own
+  # config.example.yaml defaults to oidc):
+  #   - type: jwt-jwk -> renders auth.jwkUrl
+  #   - type: oidc    -> renders auth.discoveryUrl as discovery_url
+  #   - type: static  -> renders auth.secret and auth.users (id/username/password)
+  auth:
+    type: oidc
+    # -- JWK endpoint used to validate tokens when type is "jwt-jwk".
+    jwkUrl: ""
+    # -- OIDC discovery URL used to validate tokens when type is "oidc".
+    discoveryUrl: "https://login.example.com/.well-known/openid-configuration"
+    # -- Shared secret used to sign/verify tokens when type is "static".
+    # Sensitive - prefer setting via --set or a non-committed values file.
+    secret: ""
+    # -- Local user list used when type is "static".
+    users: []
+    # - id: "11111111-1111-1111-1111-111111111111"
+    #   username: admin
+    #   password: "<set via --set or a secret values file>"
+
+  # database.type selects which schema is rendered into config.yml's
+  # `database:` section; only the field(s) for the active type are
+  # rendered. Used only as a shared, persistent cross-tile label-anchor
+  # cache (see the chart README) - not for the tile data itself, which
+  # always comes from `config.extra.tiles`/`storage` (planet.pmtiles)
+  # below.
+  #   - type: sqlite               -> renders database.database (file path) only
+  #   - type: postgres|cockroachdb -> renders host/port/username/password/ssl
+  database:
+    type: postgres
+    database: tile-render-server
+    host: ""
+    port: 5432
+    username: ""
+    # -- Database password. Sensitive - prefer setting via --set or a
+    # non-committed values file rather than checking it in.
+    password: ""
+    ssl:
+      rejectUnauthorized: true
+
+  # -- OpenTelemetry tracing (@fsarch/server built-in). `null` (the
+  # default) omits the `tracing:` section from config.yml entirely - the
+  # app repo's first official release ships with tracing support already
+  # included, so this is fully supported from the start (not a no-op like
+  # some of the other charts here that predate it). `exporter.type` is
+  # mutually exclusive: `console` needs no extra fields, `otlp-http`/
+  # `otlp-grpc` need `url` (+ optional `headers`). `sampler` defaults to
+  # `parentbased_traceidratio` if omitted (recommended - keeps sampling
+  # decisions consistent with an incoming trace's parent across fsarch
+  # services); other options: always_on, always_off, traceidratio,
+  # parentbased_always_on, parentbased_always_off.
+  tracing: null
+  # tracing:
+  #   enabled: true
+  #   serviceName: tile-render-server
+  #   sampler: parentbased_traceidratio
+  #   sampleRatio: 1.0
+  #   exporter:
+  #     type: console
+  #     # type: otlp-http
+  #     # url: http://otel-collector.fsarch.svc.cluster.local:4318/v1/traces
+  #     # headers:
+  #     #   Authorization: "Bearer <token>"
+
+  # -- Freeform passthrough for the rest of config.yml (`tiles`/`storage`) -
+  # merged in verbatim via `toYaml`. Both are too shaped-by-use-case for a
+  # bespoke values schema (see the chart README for the full schema of
+  # each, including S3/memory-cache-layering options for `storage.cache`).
+  # The defaults below reproduce the app repo's own config.example.yaml,
+  # adjusted to filesystem paths that make sense inside the container
+  # (`/data`, `/cache`) rather than the app repo's own dev-checkout paths.
+  extra:
+    tiles:
+      cacheControl: "public, max-age=3600"
+      labels: true
+      roadLabels: true
+      natureLabels: true
+      # -- Bump whenever planet.pmtiles is regenerated/replaced (see the
+      # chart README) - cross-tile label anchors cached in Postgres are
+      # keyed against this value, so a bump prevents stale anchors from a
+      # prior pmtiles build silently leaking into a new one.
+      datasetVersion: ""
+      # -- Serve zoom levels beyond planet.pmtiles' own max zoom by
+      # "overzooming" (cropping/scaling the deepest real tile). Omit to
+      # disable (requests above the dataset's max zoom 404).
+      # maxZoom: 18
+
+    # -- storage.data is always a single filesystem-or-S3 backend (no
+    # memory layer/layering) - this is where planet.pmtiles itself is
+    # read from. `/data` is ephemeral unless backed by a PVC via
+    # extraVolumes/extraVolumeMounts (see the README), or switched to S3.
+    storage:
+      data: /data
+      # -- storage.cache additionally accepts a `memory` backend and
+      # layering (an array, checked in order, each optionally restricted
+      # to a zoom range via minZoom/maxZoom) - see the README for the
+      # full schema. `/cache` is ephemeral unless backed by a PVC too.
+      cache:
+        - type: memory
+          config:
+            maxItems: 1000
+            maxBytes: 134217728 # 128 MiB
+        - /cache
+
+livenessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+
+readinessProbe:
+  enabled: true
+  tcpSocket:
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# -- Extra volumes appended to the Deployment's pod spec.
+extraVolumes: []
+
+# -- Extra volume mounts appended to the tile-render-server container.
+extraVolumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: tile-render-server.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
