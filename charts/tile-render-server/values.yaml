@@ -33,7 +33,7 @@ image:
   # this chart's creation - only `:latest` exists so far. Switch this back
   # to "" (falls back to the chart's `appVersion`) once a first stable
   # release has actually been tagged/published.
-  tag: "latest"
+  tag: "0.0.1"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
