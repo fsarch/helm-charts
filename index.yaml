@@ -2108,6 +2108,29 @@ entries:
     version: 0.0.0
   product-server:
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-09-09T10:27:29.098873657Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.1.0
+    description: A Helm chart for deploying the fsarch product-server
+    digest: cd68b39e6998c276c42945ea4024bc56dcdff4cc5576cabb7b5ed3290976b134
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - product
+    - product-server
+    maintainers:
+    - name: fsarch
+    name: product-server
+    sources:
+    - https://github.com/fsarch/product-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.4/product-server-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     appVersion: 0.0.3
     created: "2026-09-08T20:50:18.244363688Z"
     dependencies:
@@ -2199,4 +2222,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/product-server-0.0.0/product-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-08T20:50:18.244551377Z"
+generated: "2026-09-09T10:27:29.099082767Z"
