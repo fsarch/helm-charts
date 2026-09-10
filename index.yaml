@@ -1322,6 +1322,18 @@ entries:
     version: 0.0.0
   fsarch-common:
   - apiVersion: v2
+    created: "2026-09-10T21:03:42.497706108Z"
+    description: Shared Helm library with the common Deployment/Service/ServiceAccount/Namespace/Ingress
+      schema used by (most) fsarch application charts
+    digest: ad5329e505a4da96980d853017e11b6906bee7850002725fd9090fbe1eb7eb9f
+    maintainers:
+    - name: fsarch
+    name: fsarch-common
+    type: library
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/fsarch-common-0.2.0/fsarch-common-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2026-09-07T21:47:58.709435128Z"
     description: Shared Helm library with the common Deployment/Service/ServiceAccount/Namespace/Ingress
       schema used by (most) fsarch application charts
@@ -2319,4 +2331,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-10T20:57:12.982509403Z"
+generated: "2026-09-10T21:03:44.833326242Z"
