@@ -89,6 +89,10 @@ and only pass `--namespace`.
 | `nodeSelector` / `tolerations` / `affinity` | Standard scheduling controls. | `{}` / `[]` / `{}` |
 | `ingress.enabled` | Create an Ingress. | `false` |
 | `ingress.className` / `ingress.annotations` / `ingress.hosts` / `ingress.tls` | Ingress configuration. | see `values.yaml` |
+| `autoscaling.enabled` | Create a HorizontalPodAutoscaler and omit the Deployment's `spec.replicas`. | `false` |
+| `autoscaling.minReplicas` / `autoscaling.maxReplicas` | HPA replica range. | `1` / `10` |
+| `autoscaling.targetCPUUtilizationPercentage` / `autoscaling.targetMemoryUtilizationPercentage` | Resource metrics; each renders one `Resource` metric when non-empty. | `80` / `""` |
+| `autoscaling.metrics` / `autoscaling.behavior` | Additional raw `MetricSpec` entries / raw `HorizontalPodAutoscalerBehavior`, passed through verbatim. | `[]` / `{}` |
 
 Not modeled: `uac`. Unlike most other `@fsarch/server`-based charts in this
 repo, this app's `main.ts` only calls `.enableAuth()` - never anything

@@ -34,7 +34,8 @@ dependency and calls its named templates from its own `templates/*.yaml`.
    Do the same for `service.yaml` (`fsarch-common.service`),
    `serviceaccount.yaml` (`fsarch-common.serviceaccount`), `namespace.yaml`
    (`fsarch-common.namespace-resource`), `ingress.yaml`
-   (`fsarch-common.ingress`), and `NOTES.txt` (`fsarch-common.notes`).
+   (`fsarch-common.ingress`), `hpa.yaml` (`fsarch-common.hpa`), and
+   `NOTES.txt` (`fsarch-common.notes`).
 
 4. If the app needs a ConfigMap, render it in the chart's own
    `templates/configmap.yaml` (app-specific content isn't part of this
@@ -70,6 +71,7 @@ these keys must exist in the consuming chart's own `values.yaml`:
 | `extraVolumes` / `extraVolumeMounts` | Additional volumes/mounts |
 | `nodeSelector` / `tolerations` / `affinity` | Scheduling |
 | `ingress.enabled` / `ingress.className` / `ingress.annotations` / `ingress.hosts` / `ingress.tls` | Ingress |
+| `autoscaling.enabled` / `autoscaling.minReplicas` / `autoscaling.maxReplicas` / `autoscaling.targetCPUUtilizationPercentage` / `autoscaling.targetMemoryUtilizationPercentage` / `autoscaling.metrics` / `autoscaling.behavior` | HorizontalPodAutoscaler (`autoscaling/v2`). When `enabled` is true, the Deployment's `spec.replicas` is omitted so the HPA is free to manage it (avoids fighting `replicaCount` on every reconcile). `targetCPUUtilizationPercentage`/`targetMemoryUtilizationPercentage` each render one `Resource` metric when set (unset/`""` skips it); `metrics` appends further raw `MetricSpec` entries verbatim for anything else (custom/external metrics); `behavior` is passed through verbatim as `spec.behavior` when set. |
 | `config.tracing.serviceName` | Optional - if set, also added (a) as a `service.name` label (the OpenTelemetry resource attribute) on the Service, Deployment and its Pods, via `fsarch-common.labels`, and (b) as an `OTEL_SERVICE_NAME` env var on the container, which `@fsarch/server`'s tracing init already falls back to when `config.tracing.serviceName` itself is unset - see `tracing.js`'s `serviceName` resolution order. Omitted entirely when unset (e.g. tracing disabled). Not part of this library's own schema - it's read straight from the consuming chart's app-specific `config.tracing` value (see e.g. `charts/material-tracing-server/values.yaml`), so it only applies to charts that model that section. |
 
 See `charts/pdf-render-server/values.yaml` for concrete defaults.

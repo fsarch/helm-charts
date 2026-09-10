@@ -25,6 +25,22 @@ replicaCount: 1
 # -- Number of old ReplicaSets to retain for the Deployment.
 revisionHistoryLimit: 3
 
+# -- Optional HorizontalPodAutoscaler (autoscaling/v2). When enabled, the
+# Deployment's `spec.replicas` is omitted (replicaCount is ignored) so the
+# HPA is free to manage the replica count without fighting reconciliation.
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  # -- CPU utilization target (%) the HPA scales on. Set to "" to omit this metric.
+  targetCPUUtilizationPercentage: 80
+  # -- Memory utilization target (%) the HPA scales on. Set to "" to omit this metric (the default).
+  targetMemoryUtilizationPercentage: ""
+  # -- Additional raw `MetricSpec` entries (e.g. custom/external metrics), appended verbatim.
+  metrics: []
+  # -- Raw `HorizontalPodAutoscalerBehavior`, passed through verbatim when set.
+  behavior: {}
+
 image:
   repository: docker.io/fsarch/image-server
   pullPolicy: Always
