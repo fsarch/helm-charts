@@ -2236,6 +2236,30 @@ entries:
     version: 0.0.0
   tile-render-server:
   - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2026-09-10T21:15:18.128522683Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch tile-render-server
+    digest: 91c8e6d53ac631697ae8cb66e8aba2ba3a17243459df72f1907eae4866fb6f7a
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - tiles
+    - pmtiles
+    - tile-render-server
+    maintainers:
+    - name: fsarch
+    name: tile-render-server
+    sources:
+    - https://github.com/fsarch/tile-render-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.4/tile-render-server-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
     appVersion: 0.0.3
     created: "2026-09-10T20:57:12.982342603Z"
     dependencies:
@@ -2331,4 +2355,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-10T21:03:44.833326242Z"
+generated: "2026-09-10T21:15:18.128645846Z"
