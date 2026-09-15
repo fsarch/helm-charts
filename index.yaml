@@ -1772,6 +1772,29 @@ entries:
     version: 0.0.0
   material-tracing-server:
   - apiVersion: v2
+    appVersion: 0.0.7
+    created: "2026-09-15T23:53:40.715222981Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch material-tracing-server
+    digest: 09430346c4977ee7a8889042f62ab300fdaa45ff45d92cac8b96c6fff32bcf79
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - material-tracing
+    - material-tracing-server
+    maintainers:
+    - name: fsarch
+    name: material-tracing-server
+    sources:
+    - https://github.com/fsarch/material-tracing-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/material-tracing-server-0.0.7/material-tracing-server-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
     appVersion: 0.0.5
     created: "2026-09-08T20:41:21.594115556Z"
     dependencies:
@@ -2426,4 +2449,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-15T23:05:23.309255116Z"
+generated: "2026-09-15T23:53:40.716030824Z"
