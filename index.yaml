@@ -1656,6 +1656,29 @@ entries:
     version: 0.0.0
   image-server:
   - apiVersion: v2
+    appVersion: 0.0.9
+    created: "2026-09-22T20:34:51.373809273Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch image-server
+    digest: d56f7873470635963383219238e1abee7085fc93f9a3cd1a22c2f24ce22f4db5
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - images
+    - image-server
+    maintainers:
+    - name: fsarch
+    name: image-server
+    sources:
+    - https://github.com/michael-braun/image-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/image-server-0.0.9/image-server-0.0.9.tgz
+    version: 0.0.9
+  - apiVersion: v2
     appVersion: 0.0.8
     created: "2026-09-22T20:13:21.378597568Z"
     dependencies:
@@ -2610,4 +2633,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-22T20:13:21.37878139Z"
+generated: "2026-09-22T20:34:51.374116777Z"
