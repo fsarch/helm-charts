@@ -55,6 +55,7 @@ these keys must exist in the consuming chart's own `values.yaml`:
 | `namespace.create` / `namespace.name` | Namespace resource + `metadata.namespace` on everything |
 | `commonLabels` / `commonAnnotations` | Merged onto every resource |
 | `replicaCount` / `revisionHistoryLimit` | Deployment spec |
+| `image.distroless` | When `true`, appends a `-distroless` suffix to the resolved tag (e.g. `1.2.3-distroless`) - only meaningful for charts whose app repo actually publishes that variant; defaults to `false`/unset everywhere else with no effect |
 | `image.repository` / `image.tag` / `image.pullPolicy` | Container image |
 | `imagePullSecrets` | Pod spec |
 | `podLabels` / `podAnnotations` | Pod template metadata |
