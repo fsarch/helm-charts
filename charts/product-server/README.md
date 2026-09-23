@@ -36,6 +36,7 @@ and only pass `--namespace`.
 | `commonLabels` / `commonAnnotations` | Extra labels/annotations merged onto every resource. | `{}` |
 | `replicaCount` | Deployment replica count. | `1` |
 | `revisionHistoryLimit` | ReplicaSets to retain. | `3` |
+| `image.distroless` | Use the distroless image variant (appends `-distroless` to the resolved tag). Only published for tagged releases - pin a versioned `image.tag` rather than relying on `latest`. | `false` |
 | `image.repository` / `image.tag` / `image.pullPolicy` | Container image. | `docker.io/fsarch/product-server`, chart `appVersion`, `Always` |
 | `imagePullSecrets` | Pull secrets for private registries. | `[]` |
 | `podLabels` / `podAnnotations` | Extra labels/annotations on the Pod template. | `{}` |
