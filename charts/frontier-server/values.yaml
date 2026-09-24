@@ -42,6 +42,13 @@ autoscaling:
   behavior: {}
 
 image:
+  # -- Use the distroless image variant instead (appends "-distroless" to the
+  # resolved tag, e.g. "0.0.20-distroless"). The app repo only publishes this
+  # variant for tagged releases (built from Dockerfile.distroless), so there
+  # is no "latest-distroless" counterpart for plain `main` pushes - stick to
+  # a versioned `image.tag` (or the chart's default appVersion) when enabling
+  # this.
+  distroless: true
   # -- This chart deploys apps/frontier-api from the fsarch/frontier-server
   # monorepo (which also has apps/frontier-worker - see the sibling
   # frontier-worker chart) - published as the fsarch/frontier-server image
