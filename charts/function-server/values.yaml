@@ -42,6 +42,13 @@ autoscaling:
   behavior: {}
 
 image:
+  # -- Use the distroless image variant instead (appends "-distroless" to the
+  # resolved tag, e.g. "0.0.4-distroless"). The app repo only publishes this
+  # variant for tagged releases (built from Dockerfile.distroless), so there
+  # is no "latest-distroless" counterpart for plain `main` pushes - stick to
+  # a versioned `image.tag` (or the chart's default appVersion) when enabling
+  # this.
+  distroless: true
   repository: docker.io/fsarch/function-server
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
@@ -164,13 +171,12 @@ config:
   worker:
     api: {}
 
-  # -- OpenTelemetry tracing (@fsarch/server built-in as of ^0.1.6). `null`
-  # (the default) omits the `tracing:` section from config.yml entirely.
-  # NOTE: this chart's app repo currently pins an older @fsarch/server
-  # version that predates tracing - this option is a no-op until that
-  # dependency is updated there. Left in place so it's ready to use once it
-  # is. `exporter.type` is mutually exclusive: `console` needs no extra
-  # fields, `otlp-http`/`otlp-grpc` need `url` (+ optional `headers`).
+  # -- OpenTelemetry tracing (@fsarch/server built-in as of ^0.1.6, and wired
+  # up here via the app repo's Dockerfile NODE_OPTIONS
+  # "--import @fsarch/server/register"). `null` (the default) omits the
+  # `tracing:` section from config.yml entirely. `exporter.type` is mutually
+  # exclusive: `console` needs no extra fields, `otlp-http`/`otlp-grpc` need
+  # `url` (+ optional `headers`).
   # `sampler` defaults to `parentbased_traceidratio` if omitted
   # (recommended - keeps sampling decisions consistent with an incoming
   # trace's parent across fsarch services); other options: always_on,
