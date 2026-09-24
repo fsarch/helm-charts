@@ -638,6 +638,30 @@ entries:
     version: 0.0.0
   frontier-server:
   - apiVersion: v2
+    appVersion: 0.0.21
+    created: "2026-09-24T19:43:54.258364097Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch frontier-server API (apps/frontier-api
+      in the frontier-server monorepo)
+    digest: 91ecfa2cdd442b68606b5db2f58edc8fc616e05e9dfdcf848de9aae2ef849d24
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - frontier
+    - frontier-server
+    maintainers:
+    - name: fsarch
+    name: frontier-server
+    sources:
+    - https://github.com/fsarch/frontier-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/frontier-server-0.0.21/frontier-server-0.0.21.tgz
+    version: 0.0.21
+  - apiVersion: v2
     appVersion: 0.0.20
     created: "2026-08-30T00:37:11.952932152Z"
     dependencies:
@@ -2796,4 +2820,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-24T19:41:47.45944349Z"
+generated: "2026-09-24T19:43:54.258705422Z"
