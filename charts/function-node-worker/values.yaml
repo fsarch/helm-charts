@@ -57,7 +57,7 @@ image:
   # to `main`), so falling back to appVersion would point at a tag that may
   # not exist yet for a freshly bumped chart appVersion. Override once a
   # matching version tag has actually been released.
-  tag: "0.0.5"
+  tag: "0.0.6"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
