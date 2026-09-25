@@ -42,6 +42,13 @@ autoscaling:
   behavior: {}
 
 image:
+  # -- Use the distroless image variant instead (appends "-distroless" to the
+  # resolved tag, e.g. "0.0.1-distroless"). The app repo only publishes this
+  # variant for tagged releases (built from Dockerfile.distroless), so there
+  # is no "latest-distroless" counterpart for plain `main` pushes - stick to
+  # a versioned `image.tag` (or the chart's default appVersion) when enabling
+  # this.
+  distroless: true
   repository: docker.io/fsarch/email-sync-server
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
