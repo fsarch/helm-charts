@@ -2538,6 +2538,29 @@ entries:
     version: 0.0.1
   printer-server:
   - apiVersion: v2
+    appVersion: 0.0.3
+    created: "2026-09-26T10:05:46.881172324Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch printer-server
+    digest: 2240d6dba6cca82e1986c916858ff46579288009eb7ca705f4e64e7fd3a097f3
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - printer
+    - printer-server
+    maintainers:
+    - name: fsarch
+    name: printer-server
+    sources:
+    - https://github.com/fsarch/printer-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/printer-server-0.0.3/printer-server-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.0.2
     created: "2026-08-28T23:44:54.300537041Z"
     dependencies:
@@ -2960,4 +2983,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-25T17:20:44.634570345Z"
+generated: "2026-09-26T10:05:46.881284727Z"
