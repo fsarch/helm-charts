@@ -350,6 +350,29 @@ entries:
     version: 0.0.0
   email-sync-server:
   - apiVersion: v2
+    appVersion: 0.0.3
+    created: "2026-09-26T10:39:15.693758706Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch email-sync-server
+    digest: 00f5652f0cddafa5b9525c248d6328fa89579df032b3ed709b4c8bd140bcaec3
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - email
+    - email-sync-server
+    maintainers:
+    - name: fsarch
+    name: email-sync-server
+    sources:
+    - https://github.com/fsarch/email-sync-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/email-sync-server-0.0.3/email-sync-server-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2026-09-25T17:06:09.573478082Z"
     dependencies:
@@ -2983,4 +3006,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-09-26T10:05:46.881284727Z"
+generated: "2026-09-26T10:39:15.896993662Z"
