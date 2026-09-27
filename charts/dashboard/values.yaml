@@ -42,6 +42,7 @@ autoscaling:
   behavior: {}
 
 image:
+  distroless: true
   repository: docker.io/fsarch/dashboard
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
