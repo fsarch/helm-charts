@@ -512,6 +512,30 @@ entries:
     version: 0.0.0
   frontend-server:
   - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2026-10-18T07:36:41.010351391Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch frontend-server
+    digest: 6f0b60573559fb0eb1113990e82344a8e5cf0591dc39f1b1bb9d466004467277
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - frontend
+    - static-files
+    - frontend-server
+    maintainers:
+    - name: fsarch
+    name: frontend-server
+    sources:
+    - https://github.com/fsarch/frontend-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/frontend-server-0.2.0/frontend-server-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.1.1
     created: "2026-09-27T15:01:49.454263248Z"
     dependencies:
@@ -3193,4 +3217,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-10-17T14:00:41.574515714Z"
+generated: "2026-10-18T07:36:41.010603844Z"
