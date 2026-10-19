@@ -1771,6 +1771,30 @@ entries:
     version: 0.0.0
   function-node-worker:
   - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-10-19T10:15:36.703179459Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch function-node-worker
+    digest: b56fcac9b7af8a53c904d8d9a0bf140e056e9215d0406dcc534abae632f8448e
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - functions
+    - worker
+    - function-node-worker
+    maintainers:
+    - name: fsarch
+    name: function-node-worker
+    sources:
+    - https://github.com/fsarch/function-node-worker
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/function-node-worker-0.1.0/function-node-worker-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     appVersion: 0.0.6
     created: "2026-09-24T17:31:31.346370703Z"
     dependencies:
@@ -3310,4 +3334,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-10-19T08:48:36.290168678Z"
+generated: "2026-10-19T10:15:36.703503425Z"
