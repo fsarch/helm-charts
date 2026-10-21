@@ -1768,6 +1768,30 @@ entries:
     version: 0.1.0
   function-gateway:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2026-10-21T13:58:27.017865135Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch function-gateway
+    digest: 7195b9e84415fc9efd7af7c15b7587c858eaa6c682e373f3e2b7c9b3bd3f338b
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - functions
+    - gateway
+    - function-gateway
+    maintainers:
+    - name: fsarch
+    name: function-gateway
+    sources:
+    - https://github.com/fsarch/function-gateway
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/function-gateway-0.1.1/function-gateway-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2026-10-19T10:15:56.37816909Z"
     dependencies:
@@ -3521,4 +3545,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-10-21T13:58:08.090373648Z"
+generated: "2026-10-21T13:58:27.018109018Z"
