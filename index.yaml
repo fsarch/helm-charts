@@ -93,6 +93,31 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/ai-server-0.0.0/ai-server-0.0.0.tgz
     version: 0.0.0
+  aio-server:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-10-21T14:45:26.157836591Z"
+    dependencies:
+    - name: fsarch-common
+      repository: file://../fsarch-common
+      version: 0.2.0
+    description: A Helm chart for deploying the fsarch aio-server (several fsarch
+      services mounted in one process)
+    digest: 00401a7fea713b8b21819d24d15ed82d54a7f8b296126bf911f41f1da4fba5ff
+    home: https://github.com/fsarch
+    keywords:
+    - fsarch
+    - aio-server
+    - mono-service
+    maintainers:
+    - name: fsarch
+    name: aio-server
+    sources:
+    - https://github.com/fsarch/aio-server
+    type: application
+    urls:
+    - https://github.com/fsarch/helm-charts/releases/download/aio-server-0.1.0/aio-server-0.1.0.tgz
+    version: 0.1.0
   calendar-server:
   - apiVersion: v2
     appVersion: 0.0.0
@@ -3615,4 +3640,4 @@ entries:
     urls:
     - https://github.com/fsarch/helm-charts/releases/download/tile-render-server-0.0.0/tile-render-server-0.0.0.tgz
     version: 0.0.0
-generated: "2026-10-21T13:59:18.91446287Z"
+generated: "2026-10-21T14:45:26.158086671Z"
