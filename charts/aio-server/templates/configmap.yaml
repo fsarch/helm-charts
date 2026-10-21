@@ -1,0 +1,49 @@
+{{- if .Values.configMap.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fsarch-common.configMapName" . }}
+  namespace: {{ include "fsarch-common.namespace" . }}
+  labels:
+    {{- include "fsarch-common.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config.yml: |
+    {{- if .Values.config.raw }}
+    {{- .Values.config.raw | nindent 4 }}
+    {{- else }}
+    {{- if not .Values.config.services }}
+    {{- fail "config.services must list at least one service to mount (or set config.raw)" }}
+    {{- end }}
+    services:
+      {{- toYaml .Values.config.services | nindent 6 }}
+    {{- with .Values.config.tracing }}
+
+    tracing:
+      enabled: {{ .enabled }}
+      {{- if .serviceName }}
+      serviceName: {{ .serviceName | quote }}
+      {{- end }}
+      {{- if .sampler }}
+      sampler: {{ .sampler | quote }}
+      {{- end }}
+      {{- if .sampleRatio }}
+      sampleRatio: {{ .sampleRatio }}
+      {{- end }}
+      {{- with .exporter }}
+      exporter:
+        type: {{ .type | quote }}
+        {{- if ne .type "console" }}
+        url: {{ .url | quote }}
+        {{- with .headers }}
+        headers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end }}

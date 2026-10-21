@@ -24,6 +24,7 @@ Helm charts for fsarch services.
 | [`email-sync-server`](charts/email-sync-server) | IMAP/SMTP email sync service ([source](https://github.com/fsarch/email-sync-server)) |
 | [`calendar-server`](charts/calendar-server) | Calendar/event management service ([source](https://github.com/fsarch/calendar-server)) |
 | [`tile-render-server`](charts/tile-render-server) | On-demand SVG tile rendering service backed by PMTiles ([source](https://github.com/fsarch/tile-render-server)) |
+| [`aio-server`](charts/aio-server) | Several fsarch services mounted in one process via `@fsarch/server`'s `addService()` ([source](https://github.com/fsarch/aio-server)) |
 
 New application charts should build on `fsarch-common` rather than duplicating
 its Deployment/Service/etc. templates - see
