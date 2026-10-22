@@ -120,7 +120,8 @@ config:
   # TypeORM connection name - must be unique), `type` (which service
   # package: calendar-server, metric-server, function-gateway,
   # function-server, function-node-worker, image-editor-server,
-  # image-server, frontier-api) and that service's own `config`. The same
+  # image-server, frontier-api, material-tracing-server) and that service's
+  # own `config`. The same
   # `type` may be mounted several times under different `id`s.
   # Must not be empty (the chart fails to render otherwise) - the default
   # below is a single placeholder mount to show the shape, not a real

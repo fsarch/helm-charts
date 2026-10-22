@@ -28,8 +28,8 @@ chart in this repo for the options per section).
 
 Known `type`s: `calendar-server`, `metric-server`, `function-gateway`,
 `function-server`, `function-node-worker`, `image-editor-server`,
-`image-server`, `frontier-api`. The same `type` can be mounted more than once
-under different `id`s.
+`image-server`, `frontier-api`, `material-tracing-server`. The same `type`
+can be mounted more than once under different `id`s.
 
 ### Example
 
@@ -80,6 +80,8 @@ config:
 - Every mount gets its own TypeORM connection, even services without entities
   of their own (`function-node-worker`), so each entry needs a `database`
   section.
+- `material-tracing-server` mounts also serve their custom resources at
+  `/v1/<id>/.meta/custom-resources` and their MCP tools at `/<id>/.ai/mcp`.
 - With `database.type: sqlite` (or `image-server`'s filesystem storage), the
   paths have to point at a writable volume - add one via `extraVolumes` /
   `extraVolumeMounts`; the image's working directory isn't writable for the
