@@ -142,7 +142,7 @@ config:
   # package: calendar-server, metric-server, function-gateway,
   # function-server, function-node-worker, image-editor-server,
   # image-server, frontier-api, material-tracing-server, product-server,
-  # printer-server), optionally its own
+  # printer-server, dblight-server), optionally its own
   # `port` (see `servicePorts`) and that service's own `config`. The same
   # `type` may be mounted several times under different `id`s.
   # Must not be empty (the chart fails to render otherwise) - the default
