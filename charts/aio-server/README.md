@@ -25,11 +25,38 @@ chart in this repo for the options per section).
 | `config.services` | Freeform list of mounts, rendered verbatim. Each entry: `id` (route prefix + TypeORM connection name, unique), `type` (service package, see below), `config` (that service's own config). Must not be empty. |
 | `config.tracing` | Root-level OpenTelemetry config, shared by all mounts. `null` omits it. |
 | `config.raw` | Used verbatim as `config.yml` when non-empty; bypasses everything above. |
+| `servicePorts.enabled` / `.type` / `.port` / `.annotations` | Extra Service per mount with its own `port` (see below). Default: enabled, `ClusterIP`, port `80`. |
 
 Known `type`s: `calendar-server`, `metric-server`, `function-gateway`,
 `function-server`, `function-node-worker`, `image-editor-server`,
 `image-server`, `frontier-api`, `material-tracing-server`. The same `type`
 can be mounted more than once under different `id`s.
+
+### Own port per service
+
+A `services[]` entry can set `port`. aio-server then additionally serves that
+mount on that port **without** its `/<id>` prefix, exactly like the
+standalone service (`/v1/parts`, `/.ai/mcp`, swagger at `/`). It's still the
+same single app; requests on that port are just rewritten onto the mount.
+Each port maps to exactly one service, and it can't be the main port.
+
+For every such entry the chart creates an extra Service
+`<release>-aio-server-<id>` listening on port 80 and forwarding to that
+port, so other workloads can use e.g.
+`http://<release>-aio-server-material-tracing` as if it were a standalone
+material-tracing-server. The main Service keeps serving every mount under
+its prefix. These Services are derived from `config.services`, so none are
+created with `config.raw`; `id`s with their own `port` must be valid DNS
+label parts.
+
+```yaml
+config:
+  services:
+    - id: material-tracing
+      type: material-tracing-server
+      port: 8081            # -> Service <release>-aio-server-material-tracing:80
+      config: { ... }
+```
 
 ### Example
 

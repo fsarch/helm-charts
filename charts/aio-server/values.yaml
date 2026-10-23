@@ -82,6 +82,18 @@ service:
 
 containerPort: 8080
 
+# -- One extra Service per `config.services[]` entry with its own `port`
+# (named `<fullname>-<id>`), so that mount is reachable in-cluster without
+# its `/<id>` prefix, like a standalone service: it listens on `port` and
+# forwards to the mount's port in the pod. The main `service` above keeps
+# serving every mount under its prefix.
+servicePorts:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  # -- Annotations added to each of these Services.
+  annotations: {}
+
 # -- application env vars managed via well-known values below.
 # Set to "" to omit an env var entirely.
 env:
@@ -120,8 +132,8 @@ config:
   # TypeORM connection name - must be unique), `type` (which service
   # package: calendar-server, metric-server, function-gateway,
   # function-server, function-node-worker, image-editor-server,
-  # image-server, frontier-api, material-tracing-server) and that service's
-  # own `config`. The same
+  # image-server, frontier-api, material-tracing-server), optionally its own
+  # `port` (see `servicePorts`) and that service's own `config`. The same
   # `type` may be mounted several times under different `id`s.
   # Must not be empty (the chart fails to render otherwise) - the default
   # below is a single placeholder mount to show the shape, not a real

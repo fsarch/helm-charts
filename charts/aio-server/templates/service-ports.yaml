@@ -1,0 +1,36 @@
+{{- /*
+One extra Service per `config.services[]` entry that has its own `port`:
+aio-server additionally serves that mount on that port without its `/<id>`
+prefix, exactly like the standalone service. The Service listens on
+`servicePorts.port` (80) and forwards straight to that container port - a
+numeric targetPort doesn't need a matching `ports` entry on the container.
+Derived from `config.services`, so nothing is created when `config.raw` is
+used instead.
+*/ -}}
+{{- if and .Values.servicePorts.enabled (not .Values.config.raw) }}
+{{- range .Values.config.services }}
+{{- if .port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-%s" (include "fsarch-common.fullname" $) .id | trunc 63 | trimSuffix "-" }}
+  namespace: {{ include "fsarch-common.namespace" $ }}
+  labels:
+    {{- include "fsarch-common.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ .id | quote }}
+  {{- with $.Values.servicePorts.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.servicePorts.type }}
+  selector:
+    {{- include "fsarch-common.selectorLabels" $ | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ $.Values.servicePorts.port }}
+      targetPort: {{ .port }}
+{{- end }}
+{{- end }}
+{{- end }}
