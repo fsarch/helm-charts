@@ -30,8 +30,9 @@ chart in this repo for the options per section).
 
 Known `type`s: `calendar-server`, `metric-server`, `function-gateway`,
 `function-server`, `function-node-worker`, `image-editor-server`,
-`image-server`, `frontier-api`, `material-tracing-server`. The same `type`
-can be mounted more than once under different `id`s.
+`image-server`, `frontier-api`, `material-tracing-server`, `product-server`,
+`printer-server`. The same `type` can be mounted more than once under
+different `id`s.
 
 ### Own port per service
 
