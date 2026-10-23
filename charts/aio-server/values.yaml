@@ -48,7 +48,7 @@ image:
   # Pinned to "latest" until aio-server's image.yml has pushed its first
   # versioned (v*) tag - after that, bump-chart.yaml rewrites this line to
   # the released version on every stable release.
-  tag: "0.1.1"
+  tag: "0.1.2"
 
 # -- Secrets used to pull the image from a private registry.
 imagePullSecrets: []
