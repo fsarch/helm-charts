@@ -26,6 +26,7 @@ chart in this repo for the options per section).
 | `config.tracing` | Root-level OpenTelemetry config, shared by all mounts. `null` omits it. |
 | `config.raw` | Used verbatim as `config.yml` when non-empty; bypasses everything above. |
 | `servicePorts.enabled` / `.type` / `.port` / `.annotations` | Extra Service per mount with its own `port` (see below). Default: enabled, `ClusterIP`, port `80`. |
+| `servicePorts.overrides.<id>.name` / `.annotations` | Per mount: Service name instead of `<release>-aio-server-<id>`, extra annotations (merged over the shared ones). |
 
 Known `type`s: `calendar-server`, `metric-server`, `function-gateway`,
 `function-server`, `function-node-worker`, `image-editor-server`,
@@ -56,6 +57,13 @@ config:
       type: material-tracing-server
       port: 8081            # -> Service <release>-aio-server-material-tracing:80
       config: { ... }
+
+# optional: a different Service name, e.g. to keep the name clients already
+# use for the standalone material-tracing-server
+servicePorts:
+  overrides:
+    material-tracing:
+      name: material-tracing-server
 ```
 
 ### Example

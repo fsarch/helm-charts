@@ -93,6 +93,15 @@ servicePorts:
   port: 80
   # -- Annotations added to each of these Services.
   annotations: {}
+  # -- Per-mount overrides, keyed by `config.services[].id`: `name` replaces
+  # the generated `<fullname>-<id>` Service name, `annotations` are merged
+  # over the shared ones above.
+  overrides: {}
+  # overrides:
+  #   material-tracing:
+  #     name: material-tracing-server
+  #     annotations:
+  #       example.com/team: tracing
 
 # -- application env vars managed via well-known values below.
 # Set to "" to omit an env var entirely.
