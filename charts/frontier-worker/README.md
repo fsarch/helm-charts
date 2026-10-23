@@ -49,7 +49,7 @@ helm upgrade --install frontier-worker ./charts/frontier-worker \
 Or let the chart manage the namespace itself (see `namespace.create` below)
 and only pass `--namespace`.
 
-At minimum, override `extraEnv`'s `FRONTIER_CONTROL_PLANE_URL` (pointing at
+At minimum, override `extraEnv`'s `FRONTIER_API_URL` (base URL of
 your `frontier-server` deployment) and `FRONTIER_WORKER_AUTH_TOKEN` (matching
 that `frontier-server` release's `config.workers.websocket.authToken`) - the
 chart's placeholder defaults won't connect to anything real.
@@ -76,7 +76,7 @@ chart's placeholder defaults won't connect to anything real.
 | `containerPort` | Port the container listens on (the Docker image's own port). | `8080` |
 | `env.port` | `PORT` env var. Left empty - the app doesn't read `PORT`, see `extraEnv`. | `""` |
 | `env.configFilePath` | Mount path for the rendered `config.yml`, used only when `configMap.create: true`. | `/etc/frontier-worker/config.yml` |
-| `extraEnv` | `FRONTIER_WORKER_PORT` / `FRONTIER_CONTROL_PLANE_URL` / `FRONTIER_WORKER_AUTH_TOKEN` pre-populated with placeholders - **must** be overridden for a working deployment. `FRONTIER_WORKER_AUTH_TOKEN` is sensitive - set via `--set` or a non-committed values file. Commented-out entries for optional features (`FRONTIER_WORKER_HEARTBEAT_MS`, `FRONTIER_WORKER_LOG_INGEST_URL`, `FRONTIER_WORKER_CONFIG_PATH`, `FRONTIER_WORKER_DEBUG`, `FRONTIER_WORKER_TRACING_*` - see below) are documented in `values.yaml` too. | see `values.yaml` |
+| `extraEnv` | `FRONTIER_WORKER_PORT` / `FRONTIER_API_URL` / `FRONTIER_WORKER_AUTH_TOKEN` pre-populated with placeholders - **must** be overridden for a working deployment. `FRONTIER_WORKER_AUTH_TOKEN` is sensitive - set via `--set` or a non-committed values file. Commented-out entries for optional features (`FRONTIER_WORKER_HEARTBEAT_MS`, the deprecated full-URL overrides `FRONTIER_CONTROL_PLANE_URL` / `FRONTIER_WORKER_LOG_INGEST_URL`, `FRONTIER_WORKER_CONFIG_PATH`, `FRONTIER_WORKER_DEBUG`, `FRONTIER_WORKER_TRACING_*` - see below) are documented in `values.yaml` too. | see `values.yaml` |
 | `configMap.create` | Whether to render the ConfigMap holding the optional `function_worker:` config.yml. | `false` |
 | `configMap.nameOverride` | Overrides the ConfigMap name (`<fullname>-config` by default). | `""` |
 | `config.functionWorker.url` | Base URL of the function-node-worker instance to additionally dispatch to. | `http://function-node-worker.example.com` |
@@ -99,8 +99,8 @@ chart's placeholder defaults won't connect to anything real.
 extraEnv:
   - name: FRONTIER_WORKER_PORT
     value: "8080"
-  - name: FRONTIER_CONTROL_PLANE_URL
-    value: ws://frontier-server.frontier.svc.cluster.local:8080/api/workers/websocket
+  - name: FRONTIER_API_URL
+    value: http://frontier-server.frontier.svc.cluster.local:8080
   - name: FRONTIER_WORKER_AUTH_TOKEN
     value: "<set via --set or a secret values file, matches frontier-server's config.workers.websocket.authToken>"
 ```
@@ -119,8 +119,8 @@ Env-var configured (unlike the sibling `frontier-server` chart's
 extraEnv:
   - name: FRONTIER_WORKER_PORT
     value: "8080"
-  - name: FRONTIER_CONTROL_PLANE_URL
-    value: ws://frontier-server.frontier.svc.cluster.local:8080/api/workers/websocket
+  - name: FRONTIER_API_URL
+    value: http://frontier-server.frontier.svc.cluster.local:8080
   - name: FRONTIER_WORKER_AUTH_TOKEN
     value: "<...>"
   - name: FRONTIER_WORKER_TRACING_ENABLED
@@ -143,8 +143,8 @@ configMap:
 extraEnv:
   - name: FRONTIER_WORKER_PORT
     value: "8080"
-  - name: FRONTIER_CONTROL_PLANE_URL
-    value: ws://frontier-server.frontier.svc.cluster.local:8080/api/workers/websocket
+  - name: FRONTIER_API_URL
+    value: http://frontier-server.frontier.svc.cluster.local:8080
   - name: FRONTIER_WORKER_AUTH_TOKEN
     value: "<...>"
   - name: FRONTIER_WORKER_CONFIG_PATH

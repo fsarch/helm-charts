@@ -122,10 +122,13 @@ extraEnv:
   # `containerPort`.
   - name: FRONTIER_WORKER_PORT
     value: "8080"
-  # -- Websocket URL of the frontier-server control plane to connect to
-  # (its `/api/workers/websocket` endpoint).
-  - name: FRONTIER_CONTROL_PLANE_URL
-    value: "ws://frontier-server.example.com/api/workers/websocket"
+  # -- Base URL of the frontier-server API (control plane). The worker
+  # connects to `<base>/api/workers/websocket` (http->ws, https->wss) and
+  # posts request logs to `<base>/api/workers/logs`. May include a path,
+  # e.g. `http://aio-server/frontier` when frontier-api is mounted into
+  # aio-server under a prefix.
+  - name: FRONTIER_API_URL
+    value: "http://frontier-server.example.com"
   # -- Shared secret presented to frontier-server - must match the sibling
   # frontier-server chart's `config.workers.websocket.authToken`. Sensitive -
   # prefer setting via --set or a non-committed values file.
@@ -134,6 +137,9 @@ extraEnv:
   # -- Uncomment to override defaults:
   # - name: FRONTIER_WORKER_HEARTBEAT_MS
   #   value: "10000"
+  # Deprecated full URLs - override what FRONTIER_API_URL derives:
+  # - name: FRONTIER_CONTROL_PLANE_URL
+  #   value: "ws://frontier-server.example.com/api/workers/websocket"
   # - name: FRONTIER_WORKER_LOG_INGEST_URL
   #   value: "http://frontier-server.example.com/api/workers/logs"
   # - name: FRONTIER_WORKER_CONFIG_PATH
