@@ -2,8 +2,8 @@ apiVersion: v2
 name: aio-server
 description: A Helm chart for deploying the fsarch aio-server (several fsarch services mounted in one process)
 type: application
-version: 0.1.4
-appVersion: "0.1.4"
+version: 0.1.5
+appVersion: "0.1.5"
 home: https://github.com/fsarch
 sources:
   - https://github.com/fsarch/aio-server
